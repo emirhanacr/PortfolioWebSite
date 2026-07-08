@@ -1,17 +1,14 @@
-Buraya hero arka planında dönecek fotoğrafları koy:
+Hero arka planı artık video loop kullanıyor (sections/hero.js). Buraya şu dosyaları koy:
 
-  hero-1.jpg
-  hero-2.jpg
-  hero-3.jpg
+  hero-reel.mp4      (zorunlu — tüm tarayıcılarda çalışır)
+  hero-reel.webm     (opsiyonel — daha küçük dosya boyutu, tarayıcı destekliyorsa bu kullanılır)
+  hero-poster.jpg    (video yüklenene kadar görünecek kapak karesi)
 
-Sadece 1 fotoğrafın varsa diğer <img> satırlarını portfolio.html'deki
-#hero-bg bölümünden sil (veya hero-2.jpg / hero-3.jpg olarak aynı dosyayı
-kopyalayabilirsin, script tek fotoğrafta otomatik durur).
-
-Daha fazla fotoğraf eklemek istersen hero-4.jpg gibi devam edip
-portfolio.html içindeki #hero-bg div'ine aynı formatta bir <img> satırı daha ekle:
-
-  <img src="photos/hero-4.jpg" alt="" class="hero-bg-photo absolute inset-0 h-full w-full object-cover transition-opacity duration-[1800ms] ease-in-out" style="opacity:0" />
-
-Script otomatik olarak kaç tane <img class="hero-bg-photo"> varsa onların arasında
-sırayla geçiş yapar, ekstra bir ayar gerekmez.
+Notlar:
+- Video sessiz (muted) ve otomatik döngüde (loop) oynuyor, bu yüzden ses track'i gerekmez.
+- Performans için videoyu web'e uygun sıkıştır (ör. Handbrake / ffmpeg ile ~5-15 Mbps,
+  1080p'yi geçmeyen çözünürlük) — ham render dosyasını doğrudan koyma.
+- Eskiden burada duran hero-1.jpg .. hero-5.jpg dosyaları artık hero bölümünde
+  KULLANILMIYOR (slayt gösterisi yerini videoya bıraktı). Silmedim, isterseniz
+  ileride About/Projeler bölümlerinde görsel olarak kullanabilirsiniz ya da
+  silebilirsiniz.
