@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Game Developer — Portfolio</title>
-
-<!-- Google Fonts: Space Grotesk (display) / Inter (body) / JetBrains Mono (HUD/utility) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- Tailwind CDN + tema ayarları (scripts/tailwind-config.js) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="scripts/tailwind-config.js"></script>
-
-<link rel="stylesheet" href="styles/main.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emirhan Acar | Creative Technologist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
+<body class="bg-neutral-950 text-neutral-300 h-screen flex flex-col items-center justify-center selection:bg-white selection:text-black px-6 text-center">
+    
+    <div class="space-y-6 max-w-lg animate-pulse">
+        <div class="w-12 h-1 bg-neutral-600 mx-auto"></div>
+        
+        <h1 class="text-3xl md:text-5xl font-semibold tracking-tight text-white">
+            Sistem İnşa Aşamasında.
+        </h1>
+        
+        <p class="text-sm md:text-base text-neutral-400 leading-relaxed">
+            Yeni deneyimler, algoritmalar ve 3D evrenler şu an arka planda renderlanıyor. Çok yakında buradayım.
+        </p>
 
-<body class="bg-base text-ink font-body antialiased">
-
-  <!-- Her bölüm kendi dosyasında (sections/*.js), sayfa yüklenince buraya ekleniyor -->
-  <div id="header-root"></div>
-  <div id="hero-root"></div>
-  <div id="about-root"></div>
-  <div id="projects-root"></div>
-  <div id="footer-root"></div>
-
-  <script src="sections/header.js"></script>
-  <script src="sections/hero.js"></script>
-  <script src="sections/about.js"></script>
-  <script src="sections/projects.js"></script>
-  <script src="sections/footer.js"></script>
-  <script src="scripts/main.js"></script>
+        <div class="pt-8 text-xs tracking-widest text-neutral-600 uppercase">
+            Emirhan Acar &copy; 2026
+        </div>
+    </div>
 
 </body>
 </html>

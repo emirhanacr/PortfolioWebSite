@@ -18,7 +18,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 1 — Geniş (2 sütun kaplıyor) -->
     <div class="project-card group relative col-span-1 sm:col-span-2 aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-panel">
-      <img src="https://placehold.co/1200x600/17181B/8A8D93?text=3D+Render+01" alt="Proje 1" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-1.jpg" alt="Cyber District — Architectural Visualization" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <!-- Köşe çerçevesi -->
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
@@ -44,7 +44,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 2 -->
     <div class="project-card group relative aspect-[3/4] overflow-hidden bg-panel">
-      <img src="https://placehold.co/600x800/17181B/8A8D93?text=Game+Art" alt="Proje 2" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-2.jpg" alt="Void Runner — Indie Game" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
@@ -67,7 +67,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 3 -->
     <div class="project-card group relative aspect-[3/4] overflow-hidden bg-panel">
-      <img src="https://placehold.co/600x800/17181B/8A8D93?text=Product+3D" alt="Proje 3" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-3.jpg" alt="Lumina Watch — Product Render" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
@@ -90,7 +90,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 4 -->
     <div class="project-card group relative aspect-[3/4] overflow-hidden bg-panel">
-      <img src="https://placehold.co/600x800/17181B/8A8D93?text=Motion+GFX" alt="Proje 4" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-4.jpg" alt="Synapse — Motion Graphics" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
@@ -113,7 +113,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 5 — Geniş (2 sütun kaplıyor) -->
     <div class="project-card group relative col-span-1 sm:col-span-2 aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-panel">
-      <img src="https://placehold.co/1200x600/17181B/8A8D93?text=Environment+Design" alt="Proje 5" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-5.jpg" alt="Lost Temple — Game Environment" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
@@ -136,7 +136,7 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 6 -->
     <div class="project-card group relative aspect-square overflow-hidden bg-panel lg:col-span-1">
-      <img src="https://placehold.co/600x600/17181B/8A8D93?text=Character+Art" alt="Proje 6" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-6.jpg" alt="Ironclad — Character Design" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
