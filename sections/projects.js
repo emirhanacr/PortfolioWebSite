@@ -18,25 +18,27 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 1 — Geniş (2 sütun kaplıyor) -->
     <div class="project-card group relative col-span-1 sm:col-span-2 aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-panel">
-      <img src="photos/projects/project-1.jpg" alt="Cyber District — Architectural Visualization" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <img src="photos/projects/project-1.jpg" alt="Martı — Architectural Visualization" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <!-- Köşe çerçevesi -->
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <!-- İçerik -->
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Blender</span>
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#UnrealEngine</span>
-        </div>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Unity</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#CSharp</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#llm</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Photoshop</span>
+          </div>
         <h3 class="font-display text-lg sm:text-xl md:text-2xl font-semibold text-ink tracking-tight leading-tight">
-          Cyber District — Architectural Visualization
+          Martı Kaptan — Ekolojik Simülasyon
         </h3>
         <p class="max-w-md text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
-          Fütüristik bir şehir bloğunun fotorealistik 3D görselleştirmesi ve gerçek zamanlı walkthrough deneyimi.
+          Sıfır atık bilincini yaygınlaştırmak amacıyla gönüllü bir ekip tarafından geliştirilen; oyuncuları deniz temizliği ve atık ayrıştırma pratiğiyle buluşturan, eğitici ve etkileşimli bir mobil oyun projesidir.
         </p>
       </div>
       <!-- Oyna butonu -->
-      <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+      <a href="https://emirhan-acar.itch.io/marti-kaptan" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
       </a>
@@ -53,13 +55,13 @@ document.getElementById('projects-root').outerHTML = `
           <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#CSharp</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl font-semibold text-ink tracking-tight leading-tight">
-          Void Runner — Indie Game
+          Giga Pap — İndie Mobil Oyun
         </h3>
         <p class="text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
-          Prosedürel üretilen neon dünyalarda hız odaklı bir endless runner.
+          Dünyayı kurtarmak için nesli tükenmekte olan arılardan son 3'ünü koruduğunuz 2 boyutlu boss fight'a sahip tadı damağınızda kalacak mobil oyun projesidir.
         </p>
       </div>
-      <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+      <a href="https://yusufatasoy.itch.io/giga-pap" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
       </a>
@@ -72,14 +74,14 @@ document.getElementById('projects-root').outerHTML = `
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#UnrealEngine</span>
           <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Blender</span>
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Photoshop</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl font-semibold text-ink tracking-tight leading-tight">
-          Lumina Watch — Product Render
+          Just Drive — Level Design Projesi
         </h3>
         <p class="text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
-          Lüks saat markası için kaustik ışık simülasyonlu ürün görselleri.
+          Gece sürüşüne çıktığınız sizi bekleyen nascar pistinde ve kayıp şehirde gezebildiğiniz bu yolda garipliklerle karşılacağınız unreal projemizdir. Assetler blender'da modellenmiştir.
         </p>
       </div>
       <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
@@ -90,7 +92,18 @@ document.getElementById('projects-root').outerHTML = `
 
     <!-- PROJE KARTI 4 -->
     <div class="project-card group relative aspect-[3/4] overflow-hidden bg-panel">
-      <img src="photos/projects/project-4.jpg" alt="Synapse — Motion Graphics" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100" />
+      <!-- Video döngü: photos/projects/project-4.mp4 (+ opsiyonel .webm), poster olarak project-4.jpg kullanılıyor -->
+      <video
+        class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="photos/projects/project-4.jpg"
+      >
+        <source src="photos/projects/project-4.webm" type="video/webm" />
+        <source src="photos/projects/project-4.mp4" type="video/mp4" />
+      </video>
       <div class="absolute inset-0 bg-gradient-to-t from-base/90 via-base/30 to-transparent"></div>
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
@@ -99,10 +112,10 @@ document.getElementById('projects-root').outerHTML = `
           <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Cinema4D</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl font-semibold text-ink tracking-tight leading-tight">
-          Synapse — Motion Graphics
+          Project Minguinho — Rig, Animasyon, Modelleme
         </h3>
         <p class="text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
-          Nöral ağ temalı soyut motion design ve parçacık simülasyonları.
+          Modeli, riglemesi ve animasyonu bana aittir.
         </p>
       </div>
       <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
@@ -118,17 +131,19 @@ document.getElementById('projects-root').outerHTML = `
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#UnrealEngine5</span>
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Quixel</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Unity</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#CSharp</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Photoshop</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl md:text-2xl font-semibold text-ink tracking-tight leading-tight">
-          Lost Temple — Game Environment
+          Rabbit Hole — Roguelike İndie Oyun
         </h3>
         <p class="max-w-md text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
-          AAA kalitesinde ışıklandırma ve Nanite geometrisi kullanan antik tapınak ortamı.
+          Giriştiğimiz en uzun soluklu olabilecek random level generator içeren projemizdir. Karakterimiz bir buton ile dünyaya açılıp düşmanlarla savaşır. Kısıldığı labaratuvardan çıkmaya çalışır.
         </p>
       </div>
-      <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+      <a href="https://red-panda-studioo.itch.io/rabbit-hole" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
       </a>
@@ -145,13 +160,13 @@ document.getElementById('projects-root').outerHTML = `
           <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Substance</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl font-semibold text-ink tracking-tight leading-tight">
-          Ironclad — Character Design
+          Siege Of Fortune - İndie Oyun
         </h3>
         <p class="text-xs sm:text-sm text-muted leading-relaxed hidden sm:block">
           Yüksek poligonlu karakter sculpt ve PBR doku çalışması.
         </p>
       </div>
-      <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+      <a href="https://red-panda-studioo.itch.io/siege-of-fortune" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
       </a>
