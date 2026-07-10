@@ -44,18 +44,19 @@ document.getElementById('hero-root').outerHTML = `
   <!-- Merkez içerik -->
   <div class="relative z-10 flex min-h-[100dvh] flex-col items-start justify-center px-6 sm:px-12 md:px-16 max-w-6xl">
     <span class="font-mono text-[11px] sm:text-xs tracking-[0.3em] text-accent uppercase mb-4 sm:mb-6">
-      Creative Technologist
+      Game Developer &amp; 3D Artist
     </span>
 
-    <h1 class="font-display font-semibold leading-[0.95] tracking-tight text-ink text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl">
-      Gerçeği,<br />
-      <span class="text-accent">piksel piksel</span><br />
-      yeniden kur.
+    <h1 class="font-display font-semibold leading-[0.95] tracking-tight text-ink text-[11vw] sm:text-5xl md:text-6xl lg:text-7xl">
+      Etkileşimli Dünyalar ve<br />
+      <span class="text-accent">Optimizasyon Odaklı</span><br />
+      Oyun Sistemleri
     </h1>
 
     <p class="mt-6 sm:mt-8 max-w-md sm:max-w-lg font-body text-sm sm:text-base text-muted leading-relaxed" style="color:#8A8D93">
-      3D, gerçek zamanlı render ve oyun mekaniklerini tek disiplinde birleştirerek
-      markalar için sınırların ötesinde deneyimler üretiyorum.
+      3D varlık üretimi, gerçek zamanlı render ve oyun programlama disiplinlerini bir araya
+      getiriyorum. Unity ve Unreal Engine kullanarak performans odaklı oyun mekanikleri ve
+      teknik açıdan optimize edilmiş görsel deneyimler geliştiriyorum.
     </p>
   </div>
 

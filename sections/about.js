@@ -7,10 +7,13 @@ document.getElementById('about-root').outerHTML = `
     <div>
       <span class="font-mono text-[10px] sm:text-[11px] tracking-[0.3em] text-accent uppercase">Ben Kimim</span>
       <p class="mt-4 font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-ink leading-snug">
-        Piksellerle hayal eder, poligonlarla inşa eder, yapay zeka asistanlarıyla koda dökerim.
+        Oyun geliştirme üretim hattının (pipeline) hem mühendislik hem de görsel tasarım aşamalarına hakimim.
       </p>
       <p class="mt-4 max-w-md text-sm sm:text-base text-muted leading-relaxed" style="color:#8A8D93">
-        Statik tasarımları interaktif oyunlara ve web deneyimlerine çeviriyorum.
+        C# ile esnek sistem mimarileri ve oynanış mekanikleri tasarlarken; Blender, ZBrush ve
+        Substance gibi araçlarla ürettiğim 3D varlıkları motor içinde sorunsuz çalışacak şekilde
+        entegre ediyorum. Odağım; estetik ile performansı dengeleyen, sağlam altyapılı ve
+        ölçeklenebilir oyun projeleri üretmek.
       </p>
     </div>
 
@@ -22,8 +25,11 @@ document.getElementById('about-root').outerHTML = `
         <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">Illustrator</span>
         <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">Blender</span>
         <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">HTML / Tailwind</span>
-        <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">AI Prompt Engineering</span>
         <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">Unity</span>
+        <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">C# Scripting</span>
+        <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">Level Design</span>
+        <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">PBR Texturing</span>
+        <span class="rounded-full border border-white/15 px-4 py-1.5 font-mono text-[11px] tracking-[0.15em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent">Procedural Generation</span>
       </div>
     </div>
 

@@ -5,9 +5,14 @@ document.getElementById('footer-root').outerHTML = `
 
     <span class="font-mono text-[10px] sm:text-[11px] tracking-[0.3em] text-accent uppercase">İletişim</span>
 
-    <h2 class="font-display font-semibold leading-[0.95] tracking-tight text-ink text-[11vw] sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
-      Sıradaki evreni<br />birlikte inşa edelim.
+    <h2 class="font-display font-semibold leading-[0.95] tracking-tight text-ink text-[9vw] sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl">
+      Yeni Projeler ve<br />Profesyonel Fırsatlar
     </h2>
+
+    <p class="max-w-lg text-sm sm:text-base text-muted leading-relaxed" style="color:#8A8D93">
+      Oyun geliştirme süreçlerinize teknik ve görsel katkı sağlamaya hazırım. İş birliği,
+      staj veya açık pozisyonlar için benimle iletişime geçebilirsiniz.
+    </p>
 
     <a
       href="mailto:emirhan.acr@gmail.com"
@@ -25,7 +30,7 @@ document.getElementById('footer-root').outerHTML = `
 
     <div class="pt-10 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-t border-white/10 font-mono text-[10px] sm:text-[11px] tracking-widest text-muted uppercase">
       <span>Emirhan Acar &copy; 2026</span>
-      <span>Creative Technologist</span>
+      <span>Game Developer &amp; 3D Artist</span>
     </div>
 
   </div>

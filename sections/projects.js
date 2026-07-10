@@ -108,8 +108,8 @@ document.getElementById('projects-root').outerHTML = `
       <span class="pointer-events-none absolute inset-3 sm:inset-4 border border-white/0 transition-all duration-500 group-hover:border-accent/30"></span>
       <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col gap-2">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#AfterEffects</span>
-          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Cinema4D</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Premiere Pro</span>
+          <span class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] text-accent">#Blender</span>
         </div>
         <h3 class="font-display text-lg sm:text-xl font-semibold text-ink tracking-tight leading-tight">
           Project Minguinho — Rig, Animasyon, Modelleme
