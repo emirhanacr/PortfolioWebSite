@@ -37,6 +37,10 @@ document.getElementById('projects-root').outerHTML = `
           Sıfır atık bilincini yaygınlaştırmak amacıyla gönüllü bir ekip tarafından geliştirilen; oyuncuları deniz temizliği ve atık ayrıştırma pratiğiyle buluşturan, eğitici ve etkileşimli bir mobil oyun projesidir.
         </p>
       </div>
+      <!-- Katkım butonu -->
+      <a href="katkim.html?proje=1" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <!-- Oyna butonu -->
       <a href="https://emirhan-acar.itch.io/marti-kaptan" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
@@ -61,6 +65,9 @@ document.getElementById('projects-root').outerHTML = `
           Dünyayı kurtarmak için nesli tükenmekte olan arılardan son 3'ünü koruduğunuz 2 boyutlu boss fight'a sahip tadı damağınızda kalacak mobil oyun projesidir.
         </p>
       </div>
+      <a href="katkim.html?proje=2" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <a href="https://yusufatasoy.itch.io/giga-pap" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
@@ -84,6 +91,9 @@ document.getElementById('projects-root').outerHTML = `
           Gece sürüşüne çıktığınız sizi bekleyen nascar pistinde ve kayıp şehirde gezebildiğiniz bu yolda garipliklerle karşılacağınız unreal projemizdir. Assetler blender'da modellenmiştir.
         </p>
       </div>
+      <a href="katkim.html?proje=3" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
@@ -118,6 +128,9 @@ document.getElementById('projects-root').outerHTML = `
           Modeli, riglemesi ve animasyonu bana aittir.
         </p>
       </div>
+      <a href="katkim.html?proje=4" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
@@ -143,6 +156,9 @@ document.getElementById('projects-root').outerHTML = `
           Giriştiğimiz en uzun soluklu olabilecek random level generator içeren projemizdir. Karakterimiz bir buton ile dünyaya açılıp düşmanlarla savaşır. Kısıldığı labaratuvardan çıkmaya çalışır.
         </p>
       </div>
+      <a href="katkim.html?proje=5" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <a href="https://red-panda-studioo.itch.io/rabbit-hole" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
@@ -166,6 +182,9 @@ document.getElementById('projects-root').outerHTML = `
           Yüksek poligonlu karakter sculpt ve PBR doku çalışması.
         </p>
       </div>
+      <a href="katkim.html?proje=6" class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 bg-base/40 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink backdrop-blur-sm transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
+        Katkım
+      </a>
       <a href="https://red-panda-studioo.itch.io/siege-of-fortune" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-1.5 border border-white/15 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-ink transition-all duration-300 hover:border-accent hover:bg-accent/10 focus-ring">
         Oyna
         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
