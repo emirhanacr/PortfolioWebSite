@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Soggy Breads — UI & Tasarım GDD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ocean:        #1a6e8a;
+      --ocean-light:  #2a9bbf;
+      --sand:         #f5e6c8;
+      --bread:        #c48b47;
+      --bread-dark:   #9b6530;
+      --jam:          #c1292e;
+      --green:        #2d8a4e;
+      --bg:           #0d2233;
+      --bg2:          #112233;
+      --card-bg:      #16304a;
+      --card-border:  #1e4a6e;
+      --text:         #e8f4f8;
+      --muted:        #8ab0c8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ─── HEADER ─────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d2233 100%);
+      border-bottom: 3px solid var(--ocean-light);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 120%, rgba(42,155,191,0.15) 0%, transparent 70%);
+    }
+    header .waves {
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 40px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40'%3E%3Cpath d='M0,20 C200,40 400,0 600,20 C800,40 1000,0 1200,20 L1200,40 L0,40 Z' fill='%230d2233'/%3E%3C/svg%3E") repeat-x bottom;
+    }
+    header h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: var(--sand);
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(42,155,191,0.5);
+      position: relative;
+    }
+    header h1 span { color: var(--ocean-light); }
+    header .subtitle { color: var(--muted); font-size: 1rem; margin-top: 0.5rem; position: relative; }
+    header .meta-row {
+      display: flex; justify-content: center; gap: 1.5rem;
+      margin-top: 1.5rem; flex-wrap: wrap; position: relative;
+    }
+    header .meta-item {
+      background: rgba(42,155,191,0.1);
+      border: 1px solid rgba(42,155,191,0.3);
+      border-radius: 8px; padding: 0.4rem 1rem;
+      font-size: 0.85rem; color: var(--ocean-light);
+    }
+
+    /* ─── NAV ─────────────────────────────────── */
+    nav {
+      background: #0a1e30;
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 1rem;
+      display: flex; gap: 0;
+      overflow-x: auto;
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav a {
+      color: var(--muted); text-decoration: none;
+      font-weight: 700; font-size: 0.82rem;
+      padding: 0.9rem 1rem;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap; transition: all 0.2s;
+    }
+    nav a:hover { color: var(--ocean-light); border-bottom-color: var(--ocean-light); background: rgba(42,155,191,0.05); }
+
+    /* ─── CONTAINER ───────────────────────────── */
+    .container { max-width: 1340px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+    /* ─── SECTION HEADER ──────────────────────── */
+    .section-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 3.5rem 0 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--card-border);
+    }
+    .section-header .num {
+      background: var(--ocean); color: white;
+      font-family: 'Fredoka One', cursive; font-size: 1.3rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .section-header h2 { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--sand); }
+    .section-header p { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+
+    /* ─── SCREEN CARD ─────────────────────────── */
+    .screen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(620px, 1fr));
+      gap: 1.5rem;
+    }
+    @media (max-width: 700px) { .screen-grid { grid-template-columns: 1fr; } }
+
+    .screen-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .screen-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .screen-card.full { grid-column: 1 / -1; }
+
+    .screen-card-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 1rem 1.4rem;
+      background: rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .screen-id {
+      font-family: 'Fredoka One', cursive; font-size: 0.75rem;
+      background: var(--ocean); color: white;
+      padding: 0.2rem 0.6rem; border-radius: 6px; flex-shrink: 0;
+    }
+    .screen-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--sand); flex: 1; }
+    .priority-badge {
+      font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.7rem;
+      border-radius: 20px; flex-shrink: 0;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .p-high { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid #f87171; }
+    .p-mid  { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #fbbf24; }
+    .p-low  { background: rgba(34,197,94,0.2);  color: #4ade80; border: 1px solid #4ade80; }
+
+    /* ─── SCREENSHOT SECTION ──────────────────── */
+    .screenshot-area {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--card-border);
+      background: #0a1828;
+      min-height: 180px;
+    }
+    .screenshot-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem;
+      gap: 0.5rem;
+      border-right: 1px solid var(--card-border);
+    }
+    .screenshot-box:last-child { border-right: none; }
+    .screenshot-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .label-now  { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4); }
+    .label-ref  { background: rgba(42,155,191,0.2); color: var(--ocean-light); border: 1px solid rgba(42,155,191,0.4); }
+    .screenshot-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: zoom-in;
+      transition: transform 0.2s;
+    }
+    .screenshot-img:hover { transform: scale(1.02); }
+    .screenshot-caption {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 280px;
+    }
+
+    /* ─── LIGHTBOX ────────────────────────────── */
+    .lightbox {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.92);
+      align-items: center; justify-content: center;
+      cursor: zoom-out;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 92vw; max-height: 92vh; object-fit: contain; border-radius: 8px; }
+
+    /* ─── BODY OF CARD ────────────────────────── */
+    .screen-card-body { padding: 1.2rem 1.4rem; }
+
+    .current-state {
+      background: rgba(0,0,0,0.25);
+      border-left: 3px solid var(--jam);
+      border-radius: 0 8px 8px 0;
+      padding: 0.7rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.88rem; color: #fca5a5;
+    }
+    .current-state strong { color: #f87171; display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+
+    .tasks-title {
+      font-size: 0.72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); margin-bottom: 0.7rem;
+    }
+    .task-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+    .task-table th {
+      text-align: left; padding: 0.45rem 0.7rem;
+      background: rgba(0,0,0,0.3); color: var(--muted);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .task-table td { padding: 0.5rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .task-table tr:last-child td { border-bottom: none; }
+    .task-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .role {
+      display: inline-block; padding: 0.15rem 0.5rem;
+      border-radius: 5px; font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+    }
+    .role-ui   { background: rgba(124,58,237,0.25); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.4); }
+    .role-prog { background: rgba(15,118,110,0.25);  color: #5eead4; border: 1px solid rgba(15,118,110,0.4); }
+    .role-art  { background: rgba(194,65,12,0.25);   color: #fdba74; border: 1px solid rgba(194,65,12,0.4); }
+
+    .spec-box {
+      background: rgba(26,110,138,0.1);
+      border: 1px solid rgba(26,110,138,0.3);
+      border-radius: 10px; padding: 0.9rem 1rem; margin-top: 1rem; font-size: 0.85rem;
+    }
+    .spec-box .spec-title {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--ocean-light); font-weight: 800; margin-bottom: 0.5rem;
+    }
+    .spec-box ul { padding-left: 1.2rem; color: var(--muted); }
+    .spec-box ul li { margin-bottom: 0.25rem; }
+    .spec-box ul li strong { color: var(--text); }
+
+    /* ─── LEGEND ──────────────────────────────── */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 0.8rem;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 2rem; font-size: 0.85rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+
+    /* ─── OVERVIEW ────────────────────────────── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .overview-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 1.2rem; text-align: center;
+    }
+    .overview-card .ov-num { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: var(--ocean-light); line-height: 1; }
+    .overview-card .ov-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ─── COLOR SYSTEM ────────────────────────── */
+    .color-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .color-swatch { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+    .swatch { width: 56px; height: 56px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); }
+    .swatch-label { font-size: 0.68rem; color: var(--muted); text-align: center; }
+    .swatch-hex { font-size: 0.63rem; color: var(--muted); font-family: monospace; }
+
+    /* ─── CALLOUT ─────────────────────────────── */
+    .callout {
+      border-radius: 10px; padding: 0.9rem 1.1rem;
+      margin: 1rem 0; font-size: 0.88rem;
+      display: flex; gap: 0.7rem;
+    }
+    .callout-warn { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fde68a; }
+    .callout-info { background: rgba(42,155,191,0.1); border: 1px solid rgba(42,155,191,0.3); color: var(--muted); }
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+    /* ─── FOOTER ──────────────────────────────── */
+    footer { text-align: center; padding: 2rem; background: #060f1a; border-top: 1px solid var(--card-border); color: var(--muted); font-size: 0.85rem; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<header>
+  <h1>🍞 SOGGY BREADS <span>— UI & Tasarım GDD</span></h1>
+  <p class="subtitle">Kim ne yapacak? Hangi ekran nasıl görünecek? — Hırto Games</p>
+  <div class="meta-row">
+    <div class="meta-item">📅 Temmuz 2026</div>
+    <div class="meta-item">📋 21 UI Ekranı</div>
+    <div class="meta-item">🔴 7 Acil Ekran</div>
+    <div class="meta-item">🖼️ Referans görseller dahil</div>
+  </div>
+  <div class="waves"></div>
+</header>
+
+<nav>
+  <a href="#renk">🎨 Renk Sistemi</a>
+  <a href="#ana-menu">Ana Menü</a>
+  <a href="#lobi">Lobi</a>
+  <a href="#loading">Loading</a>
+  <a href="#hud">HUD</a>
+  <a href="#pause">Pause</a>
+  <a href="#tekne">Tekne İçi</a>
+  <a href="#karakter">Karakter</a>
+  <a href="#album">Albüm</a>
+  <a href="#ayarlar">Ayarlar</a>
+  <a href="#tutorial">Tutorial</a>
+  <a href="#diger">Diğer</a>
+</nav>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <div class="section-header" style="margin-top:2rem">
+    <div class="num">📊</div>
+    <div><h2>Genel Bakış</h2><p>Projedeki toplam iş yükü özeti</p></div>
+  </div>
+  <div class="overview-grid">
+    <div class="overview-card"><div class="ov-num">21</div><div class="ov-label">Farklı UI Ekranı</div></div>
+    <div class="overview-card"><div class="ov-num">7</div><div class="ov-label">Acil — Sıfırdan yapılacak</div></div>
+    <div class="overview-card"><div class="ov-num">9</div><div class="ov-label">Mevcut ama iyileştirilecek</div></div>
+    <div class="overview-card"><div class="ov-num">5</div><div class="ov-label">İyi — Küçük düzeltme</div></div>
+  </div>
+
+  <div class="legend">
+    <strong style="color:var(--sand)">Roller:</strong>
+    <div class="legend-item"><span class="role role-ui">UI Tasarımcı</span> Görsel tasarım, layout, mockup</div>
+    <div class="legend-item"><span class="role role-prog">Programcı</span> Unity bağlama, mantık, veri</div>
+    <div class="legend-item"><span class="role role-art">2D/3D Artist</span> İkon, illüstrasyon, texture</div>
+    <div class="legend-item" style="margin-left:auto"><strong style="color:var(--sand)">Görsel:</strong></div>
+    <div class="legend-item"><span class="screenshot-label label-now" style="font-size:0.7rem;padding:0.2rem 0.6rem">⬅ ŞU AN</span> Oyunun şu anki hali</div>
+    <div class="legend-item"><span class="screenshot-label label-ref" style="font-size:0.7rem;padding:0.2rem 0.6rem">REF ➡</span> Referans/ilgili görsel</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       0 — RENK SİSTEMİ
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="renk">
+    <div class="num">0</div>
+    <div><h2>Renk & Tasarım Sistemi — HERKES OKUYACAK</h2><p>Tüm ekranlar bu sisteme uyacak. Tasarıma başlamadan önce okunması zorunludur.</p></div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <span>Şu an tüm butonlar ham Unity varsayılan stilleri (düz yeşil, düz beyaz). Aşağıdaki palet TÜM ekranlara uygulanacak. Hiçbir ekran bu sistemi atlamaz.</span>
+  </div>
+
+  <div class="screen-card full" style="margin-top:1rem">
+    <div class="screen-card-body">
+      <div class="color-grid">
+        <div class="color-swatch"><div class="swatch" style="background:#1a6e8a"></div><div class="swatch-label">Okyanus Ana</div><div class="swatch-hex">#1a6e8a</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#2a9bbf"></div><div class="swatch-label">Okyanus Açık</div><div class="swatch-hex">#2a9bbf</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#f5e6c8"></div><div class="swatch-label">Kum / BG</div><div class="swatch-hex">#f5e6c8</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#c48b47"></div><div class="swatch-label">Ekmek Kahvesi</div><div class="swatch-hex">#c48b47</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#c1292e"></div><div class="swatch-label">Reçel Kırmızısı</div><div class="swatch-hex">#c1292e</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#2d8a4e"></div><div class="swatch-label">Palmiye Yeşili</div><div class="swatch-hex">#2d8a4e</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#f5c518"></div><div class="swatch-label">Altın Accent</div><div class="swatch-hex">#f5c518</div></div>
+        <div class="color-swatch"><div class="swatch" style="background:#0d2233"></div><div class="swatch-label">Koyu Deniz</div><div class="swatch-hex">#0d2233</div></div>
+      </div>
+      <div style="margin-top:1.4rem">
+        <div class="tasks-title">Tipografi Kuralları</div>
+        <table class="task-table">
+          <thead><tr><th>Kullanım Yeri</th><th>Font</th><th>Ağırlık</th><th>Renk</th></tr></thead>
+          <tbody>
+            <tr><td>Ekran Başlıkları</td><td>Fredoka One</td><td>Regular</td><td>#f5e6c8 kum</td></tr>
+            <tr><td>Buton Metinleri</td><td>Nunito</td><td>800 ExtraBold</td><td>Butona göre değişir</td></tr>
+            <tr><td>Gövde / Açıklama</td><td>Nunito</td><td>600 SemiBold</td><td>#c8dde8</td></tr>
+            <tr><td>HUD Sayılar</td><td>Fredoka One</td><td>Regular</td><td>Duruma göre kırmızı/yeşil</td></tr>
+            <tr><td>Tutorial / Kitap</td><td>Nunito</td><td>400 Regular</td><td>#4a3520 kahve</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="spec-box" style="margin-top:1.2rem">
+        <div class="spec-title">Buton Standartları</div>
+        <ul>
+          <li><strong>Birincil (Oyna, Başlat, Kaydet):</strong> Ekmek kahvesi #c48b47, radius 12px, hover'da translateY(-2px)</li>
+          <li><strong>İkincil (Geri, İptal):</strong> Şeffaf bg, okyanus mavi border</li>
+          <li><strong>Tehlikeli (Sil, Banla, Ayrıl):</strong> Reçel kırmızısı #c1292e</li>
+          <li><strong>Kaldırılacak:</strong> Tüm düz yeşil Unity butonları (#4CAF50) — hepsi değişecek</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       1 — ANA MENÜ
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="ana-menu">
+    <div class="num">1</div>
+    <div><h2>Ana Menü Ekranı</h2><p>Oyunun vitrini. İlk açıldığında görülen ekran.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-01</span>
+        <span class="screen-title">Ana Menü — Genel Layout</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Ana Menü.PNG" alt="Ana Menü şu an" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Düz beyaz bg, ham yeşil butonlar, logo ile popup çakışıyor</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          Düz beyaz arka plan. Ham yeşil butonlar (OYNA, AYARLAR, İSTEK LİSTESİ, ÇIKIŞ). "LOAD SAVE" popup'ı "Soggy Breads" logosuyla üst üste geliyor. Sol altta Discord ve böcek ikonları ham emoji olarak duruyor.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Arka plan sahne</td><td><span class="role role-art">2D/3D Artist</span></td><td>Tropikal ada + okyanus arka planı. Palmiyeler, dalgalar, gün batımı veya sabah ışığı. PNG render veya paralaks katmanlı 2D.</td></tr>
+            <tr><td>Logo tasarımı</td><td><span class="role role-art">2D/3D Artist</span></td><td>"SOGGY BREADS" Fredoka One, dalgalı su efekti. "Hırto Games" sub-logo. 1920px genişlik PNG.</td></tr>
+            <tr><td>Buton paneli</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Yarı şeffaf ahşap panel üzerinde 4 buton: OYNA · AYARLAR · İSTEK LİSTESİ · ÇIKIŞ. Oyun renk paletine göre styled.</td></tr>
+            <tr><td>LOAD SAVE popup ayrıştırma</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-prog">Programcı</span></td><td>OYNA butonuna tıklayınca ayrı modal açılmalı (bkz. UI-02). Logo asla başka elemanla örtüşmeyecek.</td></tr>
+            <tr><td>Discord & Bug butonları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Sol alt: Discord resmi rengi #5865F2. Sağ alt: Bug ikonu (kendi ikonumuz, ham emoji değil). Küçük ve dikkat dağıtmayan boyut.</td></tr>
+            <tr><td>Giriş animasyonu</td><td><span class="role role-prog">Programcı</span></td><td>Logo yukarıdan iner (0.6s ease-out), butonlar soldan kayar (0.1s gecikme). Arka plan yavaş zoom-out.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-02</span>
+        <span class="screen-title">Kayıtlı Oyunlar Modalı</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/LoadGameYeri.PNG" alt="Load Game" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Kayıtlı Oyunlar modal — koyu tema, SİL/YÜKLE butonları</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          Koyu modal: "Kayıtlı Oyunlar" başlığı, tarih/isim/can/kırıntı satırı, kırmızı SİL + mavi YÜKLE butonu. Koyu tema tutarlı ama font ve buton stili iyileştirilmeli.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Modal çerçeve</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Ahşap veya harita stili çerçeve. Başlık Fredoka One. Arka plan blur (ana menü bulanık görünsün).</td></tr>
+            <tr><td>Kayıt satırı kartı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Sol: tarih/saat. Orta: oyuncu adı · rol · can · kırıntı. Sağ: SİL (kırmızı) + YÜKLE (ekmek kahvesi). Scroll edilebilir liste.</td></tr>
+            <tr><td>Boş durum</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Kayıt yoksa ekmek karakteri omuz silker + "Henüz kayıtlı oyun yok" metni.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       2 — LOBİ
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="lobi">
+    <div class="num">2</div>
+    <div><h2>Lobi Ekranları</h2><p>Multiplayer'a giriş ve bekleme ekranları.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-03</span>
+        <span class="screen-title">Lobi Oluşturma / Katılma</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Lobi Olusturma Katılma EKranı.PNG" alt="Lobi Oluşturma" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Düz gri bg, ham yeşil butonlar, "ÖĞRETİCİ" iki satıra kırılmış</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          Düz gri/beyaz arka plan. LOBİ OLUŞTUR ve KOD İLE GİRİŞ üstte yan yana yeşil buton. Altında ÖĞRETİCİ · GERİ · AYARLAR sola yaslanmış küçük butonlar. "ÖĞRETİCİ" kelimesi ikiye bölünmüş — buton çok küçük.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Arka plan</td><td><span class="role role-art">2D/3D Artist</span></td><td>Ana menüyle aynı tropikal tema veya gece versiyonu.</td></tr>
+            <tr><td>Buton layout</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>LOBİ OLUŞTUR + KOD İLE GİRİŞ büyük ikon+metin kartları. Alt sıra: ÖĞRETİCİ · AYARLAR · GERİ yatay ve tek satırda. Metin asla 2 satıra kırılmayacak.</td></tr>
+            <tr><td>Kod giriş alanı</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-prog">Programcı</span></td><td>KOD İLE GİRİŞ seçilince 6 haneli ayrı kutucuklu input açılır. GİRİŞ butonu yanında.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-04</span>
+        <span class="screen-title">Lobi Kutusu (Kiosk Panel)</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/LobiKiosk.PNG" alt="Lobi Kiosk" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">LOBİ KUTUSU — 5 farklı renk buton, hiç hiyerarşi yok</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          Mavi (mikrofon), yeşil (davet), altın (kıyafet), sarı (başlat), bordo (ayrıl), gri (kapat) — 6 farklı renk kullanılmış. Oyuncu listesi solda, "Hazır olmak için gemiye gidip E'ye bas" talimatı var. Renk kaaosu.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Buton hiyerarşisi</td><td><span class="role role-ui">UI Tasarımcı</span></td><td><strong>Büyük-Birincil:</strong> Oyunu Başlat — ekmek kahvesi. <strong>Orta-İkincil:</strong> Davet Et, Kıyafet, Mikrofon — okyanus mavi. <strong>Küçük-Tehlikeli:</strong> Lobiden Ayrıl — reçel kırmızısı. Kapat — gri/şeffaf.</td></tr>
+            <tr><td>Oyuncu slotları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Her oyuncu: küçük ekmek avatar + isim + "Hazır ✓" badge. Boş slotlar "Bekleniyor..." gösterir.</td></tr>
+            <tr><td>Lobi kodu</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Panel üstünde büyük, kopyalanabilir lobi kodu + 📋 kopyala ikonu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-05</span>
+        <span class="screen-title">Oyuncular Paneli (Pause sekmesi)</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/oYUNCULARkISMI.PNG" alt="Oyuncular" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Turuncu/mavi kare avatarlar, aksiyon butonları satırı</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          "OYUNCULAR" başlıklı koyu panel. Turuncu/mavi kare avatar kutuları. Sağda: Sesi Açık, Yanıma Çek, At, Banla butonları. Mantık doğru ama görsel ham.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Oyuncu satırı stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Kare yerine yuvarlak köşeli ekmek silüeti avatar. Mikrofon durumu küçük badge olarak avatarda.</td></tr>
+            <tr><td>Aksiyon ikonları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Düz buton satırı yerine ikon + tooltip. At ve Banla için "Emin misin?" onayı (programcı).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       3 — LOADING SCREEN
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="loading">
+    <div class="num">3</div>
+    <div><h2>Loading Screen</h2><p>Oyuna girerken gösterilen yükleme ekranı.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card full">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-06</span>
+        <span class="screen-title">Yükleme Ekranı</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/LoadingScren.PNG" alt="Loading Screen" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Ada arka planı güzel — ama turuncu bar + pembe %64 + sistem fontu sorunlu</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar (3 ayrı sorun)</strong>
+          (1) Yükleme barı düz turuncu — oyunla ilgisiz bir renk. (2) Yüzde metni pembe/magenta — renk paletinde kesinlikle yok, çok çirkin. (3) "Hırto Games" logosu sol üstte ama sistem varsayılan fontu. (4) İpucu metni okumak zor — arka plan yok.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Yükleme barı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Ekmek kızarma teması: boşken soluk hamur (#f0d9b5), dolarken kızarmış ekmek (#c48b47) → tam dolunca koyu kahve (#8b5e2a). Bar üzerinde küçük ekmek ikonu kayar. Radius 20px.</td></tr>
+            <tr><td>Yüzde yazısı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Pembe/magenta KALDIRILACAK. Fredoka One, renk #f5e6c8 (kum), text-shadow 1px siyah. Barın altında ortalı.</td></tr>
+            <tr><td>Hırto Games logo</td><td><span class="role role-art">2D/3D Artist</span></td><td>Sol üst küçük logo. Beyaz, %80 opacity. Altında "Soggy Breads" subtitle.</td></tr>
+            <tr><td>İpucu metin kutusu</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Alt orta: #0d2233 %70 opacity panel üzerinde Nunito 600 metin. Yanında küçük ekmek ikonu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       4 — HUD
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="hud">
+    <div class="num">4</div>
+    <div><h2>HUD — Oyun İçi Arayüz</h2><p>Oyun sırasında ekranda sürekli görünen elemanlar.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-07</span>
+        <span class="screen-title">Can & Kuruluk Barları</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Can ve kuruluk Barları.PNG" alt="Can Barları" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Kırmızı can barı + mavi kuruluk barı — sade dikdörtgenler, ikon yok</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/FotografModuı.PNG" alt="HUD referans" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Can barları sol üstte oyun içinde böyle görünüyor</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          "100 / 100" kırmızı dikdörtgen + "Kuru %0" mavi/gri dikdörtgen. İkon yok, tamamen sade.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Can barı yeniden tasarımı</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-art">2D/3D Artist</span></td><td>Sol: küçük ekmek yüz ikonu. Bar dolu #c1292e kırmızı, azalınca solar. %25 altında titreme + yanıp sönme animasyonu.</td></tr>
+            <tr><td>Kuruluk barı</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-art">2D/3D Artist</span></td><td>Sol: küçük su damlası ikonu. %0 açık mavi (kuru), %100 koyu mavi + damla efekti (ıslak).</td></tr>
+            <tr><td>İkon çizimi</td><td><span class="role role-art">2D/3D Artist</span></td><td>2 adet 32×32px PNG: (1) Ekmek yüz can ikonu, (2) Su damlası kuruluk ikonu. Kalın kontur, düz renk.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-08</span>
+        <span class="screen-title">Hotbar / Hood Barı</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Hoodbarı.PNG" alt="Hotbar" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">8 gri slot: E/C/B/F/G/H/J/Z tuşları — sarı harf, ham Unity UI</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/Karakter Tasarımı.PNG" alt="Karakter ref" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Hotbar alt ortada görünüyor — oyun içi konumu</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          8 gri dikdörtgen slot. Sarı tuş harfleri (E, C, B, F, G, H, J, Z). Altında açıklama metni: Otur/Kalk, Sopa, Sapan 3, Fırlat, Kes, Bant, Balık, Emote. Tamamen ham Unity UI.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Slot çerçeve</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Ahşap görünümlü slot arka planı. Aktif slot altın parlıyor. Hover büyür. 56×56px, radius 8px.</td></tr>
+            <tr><td>8 Eylem ikonu çizimi</td><td><span class="role role-art">2D/3D Artist</span></td><td>48×48px PNG: Sandalye (Otur), Tahta (Sopa), Sapan, Ok (Fırlat), Makas (Kes), Yara bandı (Bant), Balık, Gülüz (Emote). Kalın kontur, Soggy Breads stili.</td></tr>
+            <tr><td>Tuş etiketi stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Slot sol üst köşesinde küçük koyu yuvarlak kare içinde beyaz harf. Fredoka One 10-12px.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-09</span>
+        <span class="screen-title">Gemi Dayanıklılığı + Karaya Mesafe</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/GemiDayanıklıgı.PNG" alt="Gemi Dayanıklılığı" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">"□ Karaya: 899m" + "□ GEMİ DAYANIKLILIĞI" — □ unicode sorunu var</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          "□ Karaya: 899 m" ve "□ GEMİ DAYANIKLILIĞI" — □ karakteri eksik ikonların yerinde görünüyor (Unicode sorunu). Yeşil bar var ama stil ham.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>□ Unicode düzeltmesi</td><td><span class="role role-prog">Programcı</span></td><td>"\u25A1" Unity'de desteklenmiyor. İkonlar Image component veya TMPro sprite atlas ile kullanılacak.</td></tr>
+            <tr><td>Gemi bar ikonu</td><td><span class="role role-art">2D/3D Artist</span></td><td>32×32px tekne ikonu. 3 durum: tam sağlam / hafif hasarlı / paramparça.</td></tr>
+            <tr><td>Bar tasarımı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Şeffaf arka plan, yeşil bar korunabilir. Karaya mesafe yanında küçük ada ikonu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-10</span>
+        <span class="screen-title">İnteraksiyon İpucu (Bağlam Talimatı)</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/İnteraksiyonEklentisi.PNG" alt="İnteraksiyon" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">"E - KOLTUĞA OTUR / SEÇ" — koyu bar üzerinde, çalışıyor</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum (Çalışıyor)</strong>
+          "E - KOLTUĞA OTUR / SEÇ" koyu şeffaf bar üzerinde büyük harf. Okunaklı ama font varsayılan.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Font ve stil güncelleme</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Nunito 700. Tuş (E) görsel klavye tuşu: koyu bg, hafif üst highlight. Aksiyon metni yanında. Arka plan #0d2233 %70, radius 8px.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       5 — PAUSE MENÜ
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="pause">
+    <div class="num">5</div>
+    <div><h2>Pause Menüsü</h2><p>ESC tuşuyla açılan oyun içi duraklatma ekranı.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card full">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-11</span>
+        <span class="screen-title">Pause Panel — Pasaport | Gemi | Oyuncular sekmeleri</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/PausePanel.PNG" alt="Pause Panel" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Beyaz opak butonlar, İngilizce metin (RESUME/QUIT), ham sekme barı</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/oYUNCULARkISMI.PNG" alt="Oyuncular sekmesi" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Oyuncular sekmesi şu an bu şekilde — pause içinde</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          3 sekme üstte: Pasaport · GEMİ DAYANIKLILIĞI bar · Oyuncular. 5 buton: RESUME · SETTINGS · MAIN MENU · QUIT · KAYDET. Butonlar beyaz opak, tamamen ham. Menü tam ekranı kapatan beyaz alan — oyun arka planı görünmüyor. Türkçe/İngilizce karışık.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Arka plan blur overlay</td><td><span class="role role-prog">Programcı</span></td><td>Oyun arka planı blur efektiyle görünsün. Üzerine %60 koyu overlay (#0d2233). Tam opak beyaz alan kalkacak.</td></tr>
+            <tr><td>Sekme tasarımı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>3 sekme: Pasaport ikonu+metin, Gemi ikonu+"Gemi Durumu", Oyuncular ikonu+metin. Aktif sekme altı çizili. Geçiş animasyonlu (slide).</td></tr>
+            <tr><td>Buton tasarımları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td><strong>DEVAM ET:</strong> büyük, ekmek kahvesi. <strong>AYARLAR + ANA MENÜ:</strong> okyanus mavi border. <strong>KAYDET:</strong> palmiye yeşili. <strong>OYUNDAN ÇIK:</strong> reçel kırmızısı, en altta, küçük.</td></tr>
+            <tr><td>Türkçeleştirme</td><td><span class="role role-prog">Programcı</span></td><td>RESUME→DEVAM ET, SETTINGS→AYARLAR, MAIN MENU→ANA MENÜ, QUIT→OYUNDAN ÇIK.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       6 — TEKNE İÇİ
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="tekne">
+    <div class="num">6</div>
+    <div><h2>Tekne İçi UI</h2><p>Teknedeki rol seçme ekranı.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card full">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-12</span>
+        <span class="screen-title">Rol Seçme Ekranı</span>
+        <span class="priority-badge p-high">🔴 Acil</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/TekneİçUı.PNG" alt="Tekne İçi UI" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Düz turuncu büyük kutular — SOL KÜREKÇİ, SAĞ KÜREKÇİ, HARİTACI-KAPTAN. Hiç illüstrasyon yok.</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/Eklenti Tutorial ekranları.PNG" alt="Kürekçi Talimatı" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Kürekçi (Sol) kontrol kartı — rol anlatımı için referans içerik</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          Gri arka plan. 3 turuncu büyük dikdörtgen: SOL KÜREKÇİ, SAĞ KÜREKÇİ, HARİTACI-KAPTAN. Sağda aynı isimler "BOŞ" etiketi ile. Alt: "TEKNENİN CANI : 100/100" yeşil yazı. Hiçbir görsel ipucu, ikon veya açıklama yok.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Rol kartı tasarımı</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-art">2D/3D Artist</span></td><td>Her rol için illüstrasyon içeren kart: <strong>Sol/Sağ Kürekçi</strong> = kürek tutan ekmek. <strong>Haritacı-Kaptan</strong> = dürbünlü ekmek. Alt kısımda 1-2 cümle rol açıklaması. Seçilince altın kenar parlar.</td></tr>
+            <tr><td>3 Rol ikonu</td><td><span class="role role-art">2D/3D Artist</span></td><td>128×128px PNG: Kürek / Harita+pusula / Kaptan şapkası. Kalın kontur.</td></tr>
+            <tr><td>Oyuncu slotu göstergesi</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Her kartın altında "Oturan: [İsim]" veya "Boş — E ile al". Dolu rol kartı kilitli görünür.</td></tr>
+            <tr><td>Tekne canı barı</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Yeşil yazı yerine HUD'daki gemi barıyla aynı görsel dil.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       7 — KARAKTER
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="karakter">
+    <div class="num">7</div>
+    <div><h2>Karakter Özelleştirme (Pasaport)</h2></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card full">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-13</span>
+        <span class="screen-title">Pasaport Ekranı</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Karakter Tasarımı.PNG" alt="Pasaport" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">PASAPORT ekranı — 3D dönen önizleme, özellik seçiciler, hazır karakterler</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/Yüzİafeleri.png" alt="Yüz ifadeleri" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">6 farklı yüz ifadesi konsept art — özelleştirme referansı</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum (Nispeten İyi)</strong>
+          "PASAPORT" başlıklı, krem/bej arka planlı panel. Sol: dönen 3D önizleme. Sağ: özellik seçiciler. Alt: Hazır Karakterler + Kaydet. Sistem çalışıyor, sadece cila gerekiyor.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Panel görsel cila</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Bej rengi ve pasaport estetiği korunacak. Fredoka One başlık, önizleme alanına hafif çerçeve.</td></tr>
+            <tr><td>◄ ► okları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Ham üçgen yerine yuvarlak arka planlı ok butonu, hover'da renk değişimi.</td></tr>
+            <tr><td>Hazır Karakter kartları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Düz mavi butonlar yerine mini önizleme içeren kartlar. Hover'da karakter adı tooltip.</td></tr>
+            <tr><td>Şapka Rengi seçici</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-prog">Programcı</span></td><td>Ham sarı kutu yerine 8-12 hazır renk paleti popup'ı.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       8 — ALBÜM & FOTOĞRAF
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="album">
+    <div class="num">8</div>
+    <div><h2>Albüm & Fotoğraf Modu</h2></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-14</span>
+        <span class="screen-title">Fotoğraf Albümü</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Album.PNG" alt="Albüm" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Grid'de fotoğraflar, Önceki/Sonraki sayfalama, her kartın sağ üstünde ikon</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          "ALBÜM" overlay, 4×3 grid fotoğraf kartları, alt sayfalama. Çalışıyor ama minimal stil.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Polaroid çerçeve stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Beyaz polaroid çerçeve, altında tarih/saat küçük yazı. Hover'da döner/büyür.</td></tr>
+            <tr><td>Fotoğraf büyütme modu</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-prog">Programcı</span></td><td>Tıklanınca tam ekran, sağda efektler paneli (bkz. UI-15). ESC veya X ile kapatma.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-15</span>
+        <span class="screen-title">Fotoğraf Düzenleme Efektleri</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/FotoDüzenlemeYeri.PNG" alt="Foto Düzenleme" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">EFEKTLER paneli: Parlaklık, Kontrast, Doygunluk, Vinyet, Sepya, Renk Tonu</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/FotografModuı.PNG" alt="Fotoğraf Modu" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Fotoğraf modu aktifken HUD — alt bilgi çubuğu ve kontroller</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum (Gayet İyi)</strong>
+          EFEKTLER paneli: 6 parametre, Sıfırla + Kaydet + Geri. Layout mantıklı, sadece font/renk güncellemesi gerekiyor.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>◄ ► → gerçek slider</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-prog">Programcı</span></td><td>◄ 1,0 ► yerine sürüklenebilir slider + sağda sayısal değer.</td></tr>
+            <tr><td>Font ve renk</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Sistem fontu → Nunito. Siyah metin → renk paletine uygun.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       9 — AYARLAR
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="ayarlar">
+    <div class="num">9</div>
+    <div><h2>Ayarlar Ekranı</h2></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card full">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-16</span>
+        <span class="screen-title">Ayarlar — Grafikler, Ses, Dil</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Ayarlar.PNG" alt="Ayarlar" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Sol: Grafikler/Çözünürlük/Ekran Modu/Dil. Sağ: Ses/Müzik/Fare/Mikrofon slider'ları. Mor renk paletinde.</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Sorunlar</strong>
+          Beyaz arka plan. Mor/koyu mor renkler kullanılmış (oyunun genel paleti değil). Slider'lar gri. İki sütun layout mantıklı ama görsel tutarsız.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Arka plan ve renk paleti</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Beyaz arka plan → koyu deniz tonu (#0d2233). Mor renkler kaldırılacak. Başlıklar: kum sarısı #f5e6c8. Değer metinleri: açık mavi #c8dde8.</td></tr>
+            <tr><td>Slider stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Gri slider → ekmek kahvesi track, altın thumb. Ses barları için hoparlör ikonu eklenecek.</td></tr>
+            <tr><td>Geri butonu stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Sol üstteki mor geri butonu → oyun standardına getirilecek (okyanus mavi, yuvarlak köşe).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       10 — TUTORIAL
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="tutorial">
+    <div class="num">10</div>
+    <div><h2>Tutorial Sistemi</h2></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-17</span>
+        <span class="screen-title">Tutorial Kitapçığı (32 sayfa)</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Tutoraial Kitapçığı.PNG" alt="Tutorial Kitabı" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">"Hoş Geldin, Ekmek Kardeşim! □" — ahşap çerçeve, krem kağıt, 1/32 sayfa</span>
+        </div>
+        <div class="screenshot-box">
+          <span class="screenshot-label label-ref">REF ➡</span>
+          <img class="screenshot-img" src="ui_gorseller/Eklenti Tutorial ekranları.PNG" alt="Kürekçi Talimatı" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Kürekçi (Sol) talimat kartı — tutorial içerik referansı</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum (Genel Olarak İyi)</strong>
+          Ahşap çerçeve + krem kağıt estetiği doğru. 1/32 sayfa. Sol/sağ ok navigasyonu. "□" karakteri eksik ikon placeholder. İçerik metni eğlenceli ve uygun.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>□ Unicode düzeltme</td><td><span class="role role-prog">Programcı</span></td><td>TMPro sprite asset veya Image component ile ikon eklenmeli.</td></tr>
+            <tr><td>Sayfa illustrasyonları</td><td><span class="role role-art">2D/3D Artist</span></td><td>32 sayfanın öncelikli 10'u için küçük çizim: Hareket, Kürek, Balık Tutma, Martı Saldırısı, Pazaryeri, Rol Seçme vb. Karakalem/komik Soggy Breads stili.</td></tr>
+            <tr><td>Sayfa çevirme animasyonu</td><td><span class="role role-prog">Programcı</span></td><td>Ok ile sayfa değişince hafif flip veya slide animasyonu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-18</span>
+        <span class="screen-title">Kürekçi Kontrol Talimat Kartı</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/Eklenti Tutorial ekranları.PNG" alt="Kürekçi Talimatı" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">KÜREKÇİ (SOL) — W/S/A/D/R/E/Space kontrolleri açıklanmış</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum (Çalışıyor)</strong>
+          Mavi kart üzerinde beyaz metin, madde madde kontrol listesi. Bilgi doğru ve okunaklı. Font ve arka plan ham.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Kart stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Tutorial kitabıyla aynı krem/ahşap stil. Her tuş kombonu görsel tuş etiketiyle. Mavi arka plan kalkacak.</td></tr>
+            <tr><td>Haritacı & Sağ Kürekçi kartları</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Diğer 2 rol için de aynı tarzda kart oluşturulacak.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       11 — DİĞER
+  ══════════════════════════════════════════════ -->
+  <div class="section-header" id="diger">
+    <div class="num">11</div>
+    <div><h2>Diğer Ekranlar</h2><p>Balık tutma, geri bildirim, hedefleme.</p></div>
+  </div>
+
+  <div class="screen-grid">
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-19</span>
+        <span class="screen-title">Balık Tutma Mini Oyunu UI</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/BalıkTutmaEkranı.PNG" alt="Balık Tutma" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">"Balığı yeşilde tut!" — sol çubuk (oyuncu), sağ çubuk (hedef). Ham dikdörtgenler.</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          İki dikey bar: sol yeşil (oyuncu pozisyonu), sağ mavi/koyu (hedef bölgesi). Talimat metni var. Çalışıyor ama görsel ham.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Bar ve çerçeve tasarımı</td><td><span class="role role-ui">UI Tasarımcı</span> + <span class="role role-art">2D/3D Artist</span></td><td>Barların yanına olta ve balık ikonları. Hedef bölge vurgulu renk. Bar arka planı hafif dalga deseni.</td></tr>
+            <tr><td>Başarı/başarısızlık geri bildirimi</td><td><span class="role role-prog">Programcı</span> + <span class="role role-ui">UI Tasarımcı</span></td><td>Tutulunca "🐟 Yakalandı!" popup + balık görseli. Kaçarsa "Kaçtı!" animasyonu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-20</span>
+        <span class="screen-title">Geri Bildirim Gönder</span>
+        <span class="priority-badge p-low">🟢 Düşük</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/BugGönderme.PNG" alt="Bug Gönderme" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">"GERİ BİLDİRİM GÖNDER" — büyük siyah input kutusu, kırmızı GÖNDER butonu</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          Büyük siyah input + kırmızı GÖNDER butonu. Geri butonu sol üstte. Açık gri/mavi arka plan oyunla tutarsız.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Input alanı ve tema</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Siyah → koyu gri #1a2e40, hafif border. Arka plan → oyunun koyu teması. Placeholder: "Karşılaştığın sorunu yaz..."</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="screen-card">
+      <div class="screen-card-header">
+        <span class="screen-id">UI-21</span>
+        <span class="screen-title">Uzuv Hedefleme UI</span>
+        <span class="priority-badge p-mid">🟡 Orta</span>
+      </div>
+      <div class="screenshot-area">
+        <div class="screenshot-box">
+          <span class="screenshot-label label-now">⬅ ŞU AN</span>
+          <img class="screenshot-img" src="ui_gorseller/ArkadaşınınKolbacakKeSMEyeri.PNG" alt="Uzuv Hedefleme" onclick="openLightbox(this.src)" />
+          <span class="screenshot-caption">Dairesel altın hedef göstergesi + oyuncu adı + kırmızı İptal butonu</span>
+        </div>
+      </div>
+      <div class="screen-card-body">
+        <div class="current-state">
+          <strong>Şu Anki Durum</strong>
+          Dairesel turuncu/altın çember. Üstte "cagahai355 (Kendim)". Ortada kırmızı hedef noktası. Alt: kırmızı İptal butonu. Çalışıyor ama görsel ham.
+        </div>
+        <div class="tasks-title">Yapılacaklar</div>
+        <table class="task-table">
+          <thead><tr><th>Görev</th><th>Kim</th><th>Detay</th></tr></thead>
+          <tbody>
+            <tr><td>Hedefleme dairesi</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Daha ince ve keskin çizgilerle daire. Merkez nokta daha görünür. Hangi uzuv seçildiği göstergesi (Sol Kol / Sağ Kol / Kafa) üstte eklenecek.</td></tr>
+            <tr><td>İptal butonu stili</td><td><span class="role role-ui">UI Tasarımcı</span></td><td>Kırmızı buton korunabilir ama font oyun standardına getirilecek.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GENEL NOTLAR
+  ══════════════════════════════════════════════ -->
+  <div class="section-header">
+    <div class="num">⚡</div>
+    <div><h2>Ortak Kurallar — Tüm Ekranlar</h2></div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <span><strong>Herkese:</strong> Yaptığınız her UI elementinde Bölüm 0'daki renk paletini ve font kurallarını uygulayın. "Geçici bir şey yapayım" diye ham bırakılan hiçbir şey nihai sürüme giremez.</span>
+  </div>
+  <div class="callout callout-info" style="margin-top:0.8rem">
+    <span class="callout-icon">💻</span>
+    <span><strong>Programcıya:</strong> Tüm ekranlarda Unity varsayılan Button/Text bileşenleri TextMeshPro ile değiştirilecek. TMP font asset olarak Nunito ve Fredoka One eklenecek. Minimum 1920×1080 baz, 1280×720'ye scale edilebilir.</span>
+  </div>
+  <div class="callout callout-info" style="margin-top:0.8rem">
+    <span class="callout-icon">🎨</span>
+    <span><strong>UI Tasarımcıya:</strong> Tüm mockup'lar Figma'da yapılacak, onaylandıktan sonra Unity'e aktarılacak. Sprite'lar @2x çözünürlükte export. Her ikon @1x ve @2x olarak kaydedilecek.</span>
+  </div>
+  <div class="callout callout-info" style="margin-top:0.8rem">
+    <span class="callout-icon">✏️</span>
+    <span><strong>2D/3D Artist'e:</strong> İkonlar kalın konturlu (3-4px), düz renk dolgulu, Soggy Breads çizgi stiline uygun. Detay fazla olmamalı — oyun içinde küçük boyutlarda görünecekler. Tüm ikonlar PNG, şeffaf arka plan.</span>
+  </div>
+
+</div>
+
+<footer>
+  <p>🍞 Soggy Breads — UI & Tasarım GDD | Hırto Games | Temmuz 2026</p>
+  <p style="margin-top:0.3rem; font-size:0.78rem; opacity:0.5">Görsellere tıklayarak büyütebilirsin. Bu doküman oyun sürümleriyle güncellenecektir.</p>
+</footer>
+
+<script>
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('active');
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('active');
+  });
+</script>
+
+</body>
+</html>
