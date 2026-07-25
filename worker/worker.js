@@ -28,13 +28,43 @@ const MAX_TASKS = 40;           // tek yanıtta kabul edilen azami görev
 const RATE_LIMIT_MAX = 15;      // pencere başına istek
 const RATE_LIMIT_WINDOW = 3600; // saniye (1 saat)
 
-// Sekiz kategori, iki bölüm: ilk beşi kişisel panoya, son üçü geliştirme panosuna
-// düşer. Bölüm bilgisi ayrıca taşınmaz — istemci kategoriden türetir.
-const CATEGORIES = ['İş', 'Kişisel', 'Finans', 'Acil', 'Diğer', 'Bug', 'Eklenecek', 'Test'];
+// On üç kategori, üç bölüm: ilk beşi kişisel, sonraki üçü geliştirme, son beşi
+// sanat panosuna düşer. Bölüm bilgisi ayrıca taşınmaz — istemci kategoriden türetir.
+const CATEGORIES = [
+  'İş', 'Kişisel', 'Finans', 'Acil', 'Diğer',
+  'Bug', 'Eklenecek', 'Test',
+  'Konsept', 'Modelleme', 'Doku', 'Rig & Animasyon', 'Entegrasyon',
+];
 const FALLBACK_CATEGORY = 'Diğer';
 
-// Tek paragrafın her iki panoyu birden besleyebilmesi için birleşik prompt.
-const SYSTEM_PROMPT = "Sen yalnızca yapılandırılmış veri üreten bir veri ayrıştırma motorusun. Sohbet etme, açıklama yapma. Girdi metnindeki görevleri çıkar, eğer birden fazlaysa böl. Her görevi şu kategorilerden birine ata: günlük işler için 'İş', 'Kişisel', 'Finans', 'Acil', 'Diğer'; oyun geliştirme işleri için 'Bug', 'Eklenecek', 'Test'. 'Bug' = düzeltilmesi gereken hata veya arıza. 'Eklenecek' = yeni özellik, içerik veya iyileştirme. 'Test' = denenmesi veya doğrulanması gereken şey. Kategorisi belirsizse 'Diğer' kullan. SADECE VE SADECE geçerli bir JSON array formatında yanıt ver. Markdown (```json) KULLANMA. Şablon: [{'task': 'görev tanımı', 'category': 'Kategori'}]. Görev yoksa [] dön.";
+/**
+ * Kategori sayısı arttıkça modelin sözlüğü birebir tutturma olasılığı düşüyor.
+ * Yaygın varyantları doğru kategoriye çekiyoruz; eşleşmeyen yine 'Diğer'e düşer.
+ * Anahtarlar küçük harfe indirgenmiş halde tutulur.
+ */
+const CATEGORY_ALIASES = {
+  'rig': 'Rig & Animasyon',
+  'animasyon': 'Rig & Animasyon',
+  'rig ve animasyon': 'Rig & Animasyon',
+  'rig&animasyon': 'Rig & Animasyon',
+  'rigging': 'Rig & Animasyon',
+  'doku ve materyal': 'Doku',
+  'doku & materyal': 'Doku',
+  'materyal': 'Doku',
+  'texture': 'Doku',
+  'tekstür': 'Doku',
+  'konsept sanat': 'Konsept',
+  'referans': 'Konsept',
+  'model': 'Modelleme',
+  'modelling': 'Modelleme',
+  'entegre': 'Entegrasyon',
+  'entegrasyon işi': 'Entegrasyon',
+  'hata': 'Bug',
+  'özellik': 'Eklenecek',
+};
+
+// Tek paragrafın üç panoyu birden besleyebilmesi için birleşik prompt.
+const SYSTEM_PROMPT = "Sen yalnızca yapılandırılmış veri üreten bir veri ayrıştırma motorusun. Sohbet etme, açıklama yapma. Girdi metnindeki görevleri çıkar, eğer birden fazlaysa böl. Her görevi şu kategorilerden birine ata. Günlük işler: 'İş', 'Kişisel', 'Finans', 'Acil', 'Diğer'. Oyun kodu ve mekanikleri: 'Bug' (düzeltilmesi gereken hata veya arıza), 'Eklenecek' (yeni özellik, mekanik veya sistem), 'Test' (denenmesi veya doğrulanması gereken şey). Görsel varlık üretimi: 'Konsept' (referans toplama, eskiz, moodboard), 'Modelleme' (high poly, low poly, retopoloji), 'Doku' (UV açma, bake, materyal, PBR), 'Rig & Animasyon' (iskelet, skinning, animasyon klipleri), 'Entegrasyon' (motora aktarma, prefab kurulumu, LOD). Ayrım kuralı: iş kod veya oyun mekaniğiyle ilgiliyse 'Eklenecek' kullan; görsel bir varlık üretmekle ilgiliyse üretim aşamasına göre sanat kategorilerinden birini kullan. Kategorisi belirsizse 'Diğer' kullan. SADECE VE SADECE geçerli bir JSON array formatında yanıt ver. Markdown (```json) KULLANMA. Şablon: [{'task': 'görev tanımı', 'category': 'Kategori'}]. Görev yoksa [] dön.";
 
 /* ============================ GİRİŞ ============================ */
 
@@ -246,6 +276,23 @@ function extractJson(raw) {
   throw new Error('JSON bulunamadı');
 }
 
+/**
+ * Kategoriyi sözlüğe oturtur: önce birebir, sonra büyük/küçük harf duyarsız,
+ * sonra takma ad tablosu. Hiçbiri tutmazsa 'Diğer'.
+ */
+function canonicalCategory(raw) {
+  if (typeof raw !== 'string') return FALLBACK_CATEGORY;
+
+  const trimmed = raw.trim();
+  if (CATEGORIES.includes(trimmed)) return trimmed;
+
+  const key = trimmed.toLocaleLowerCase('tr');
+  const caseless = CATEGORIES.find((c) => c.toLocaleLowerCase('tr') === key);
+  if (caseless) return caseless;
+
+  return CATEGORY_ALIASES[key] || FALLBACK_CATEGORY;
+}
+
 /** Her kaydı doğrular, uydurma kategorileri "Diğer"e düşürür. */
 function normalizeTasks(parsed) {
   let list = parsed;
@@ -257,6 +304,6 @@ function normalizeTasks(parsed) {
     .slice(0, MAX_TASKS)
     .map((item) => ({
       task: item.task.trim().slice(0, 300),
-      category: CATEGORIES.includes(item.category) ? item.category : FALLBACK_CATEGORY,
+      category: canonicalCategory(item.category),
     }));
 }

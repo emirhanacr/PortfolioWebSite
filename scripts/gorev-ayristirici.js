@@ -21,15 +21,15 @@
     API_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev',
 
     STORAGE_KEY: 'gorev_ayristirici_tasks',
-    COLLAPSE_KEY: 'gorev_ayristirici_collapsed',
+    COLLAPSE_PREFIX: 'gorev_ayristirici_collapsed_',
     MAX_INPUT_CHARS: 2000,
 
+    // DOM id'leri bölüm adından türetilir: board-X / count-X / toggle-X /
+    // toggleIcon-X / toggleLabel-X. Yeni bölüm eklerken HTML'de aynı kalıba uy.
     BOARDS: Object.freeze([
       {
         id: 'kisisel',
-        mount: 'board-kisisel',
-        countEl: 'countKisisel',
-        grid: 'xl',
+        label: 'Kişisel',
         categories: Object.freeze([
           { id: 'İş',      icon: 'ph-briefcase',              tone: 'text-accent',  rule: 'from-accent/40' },
           { id: 'Kişisel', icon: 'ph-user',                   tone: 'text-accent',  rule: 'from-accent/40' },
@@ -40,13 +40,25 @@
       },
       {
         id: 'gelistirme',
-        mount: 'board-gelistirme',
-        countEl: 'countGelistirme',
-        grid: 'md',
+        label: 'geliştirme',
         categories: Object.freeze([
           { id: 'Bug',       icon: 'ph-bug',         tone: 'text-red-400', rule: 'from-red-500/40' },
           { id: 'Eklenecek', icon: 'ph-plus-circle', tone: 'text-accent',  rule: 'from-accent/40' },
           { id: 'Test',      icon: 'ph-flask',       tone: 'text-accent',  rule: 'from-accent/40' },
+        ]),
+      },
+      {
+        // Üretim boru hattı — kolon sırası bilinçli olarak iş akışını izler.
+        id: 'sanat',
+        label: 'sanat',
+        categories: Object.freeze([
+          { id: 'Konsept',        icon: 'ph-pencil-simple',     tone: 'text-accent', rule: 'from-accent/40' },
+          { id: 'Modelleme',      icon: 'ph-cube',              tone: 'text-accent', rule: 'from-accent/40' },
+          { id: 'Doku',           icon: 'ph-paint-brush',       tone: 'text-accent', rule: 'from-accent/40' },
+          // `id` worker sözlüğüyle birebir eşleşmek zorunda; `label` sadece kolon
+          // başlığında görünür — tam adı 5 kolonlu ızgaraya sığmıyor.
+          { id: 'Rig & Animasyon', label: 'Rig & Anim', icon: 'ph-person-simple-run', tone: 'text-accent', rule: 'from-accent/40' },
+          { id: 'Entegrasyon',    icon: 'ph-package',           tone: 'text-accent', rule: 'from-accent/40' },
         ]),
       },
     ]),
@@ -90,13 +102,19 @@
     clearAllIcon: document.getElementById('clearAllIcon'),
     clearAllLabel: document.getElementById('clearAllLabel'),
 
-    boardKisisel: document.getElementById('board-kisisel'),
-    toggleKisisel: document.getElementById('toggleKisisel'),
-    toggleKisiselIcon: document.getElementById('toggleKisiselIcon'),
-    toggleKisiselLabel: document.getElementById('toggleKisiselLabel'),
-
     toastContainer: document.getElementById('toastContainer'),
   };
+
+  /** Bir bölümün DOM elemanlarını id kalıbından toplar. */
+  function boardEls(boardId) {
+    return {
+      mount: document.getElementById('board-' + boardId),
+      count: document.getElementById('count-' + boardId),
+      toggle: document.getElementById('toggle-' + boardId),
+      icon: document.getElementById('toggleIcon-' + boardId),
+      label: document.getElementById('toggleLabel-' + boardId),
+    };
+  }
 
   /* ============================================================
    * Storage — hiçbir koşulda patlamaz
@@ -308,19 +326,27 @@
    * Kısaltma (üst bölüm)
    * ========================================================== */
   const Collapse = {
-    isCollapsed() { return Storage.read(CONFIG.COLLAPSE_KEY, false) === true; },
+    key(boardId) { return CONFIG.COLLAPSE_PREFIX + boardId; },
 
-    apply(collapsed) {
-      DOM.boardKisisel.classList.toggle('hidden', collapsed);
-      DOM.toggleKisiselIcon.className = 'ph ' + (collapsed ? 'ph-caret-down' : 'ph-caret-up') + ' text-xs';
-      DOM.toggleKisiselLabel.textContent = collapsed ? 'Göster' : 'Kısalt';
-      DOM.toggleKisisel.setAttribute('aria-expanded', String(!collapsed));
+    isCollapsed(boardId) { return Storage.read(Collapse.key(boardId), false) === true; },
+
+    apply(boardId, collapsed) {
+      const els = boardEls(boardId);
+      if (!els.mount || !els.toggle) return;
+      els.mount.classList.toggle('hidden', collapsed);
+      els.icon.className = 'ph ' + (collapsed ? 'ph-caret-down' : 'ph-caret-up') + ' text-xs';
+      els.label.textContent = collapsed ? 'Göster' : 'Kısalt';
+      els.toggle.setAttribute('aria-expanded', String(!collapsed));
     },
 
-    toggle() {
-      const next = !Collapse.isCollapsed();
-      Storage.write(CONFIG.COLLAPSE_KEY, next);
-      Collapse.apply(next);
+    toggle(boardId) {
+      const next = !Collapse.isCollapsed(boardId);
+      Storage.write(Collapse.key(boardId), next);
+      Collapse.apply(boardId, next);
+    },
+
+    applyAll() {
+      CONFIG.BOARDS.forEach((b) => Collapse.apply(b.id, Collapse.isCollapsed(b.id)));
     },
   };
 
@@ -330,7 +356,7 @@
   const UI = {
     renderBoards() {
       CONFIG.BOARDS.forEach((board) => {
-        const mount = document.getElementById(board.mount);
+        const mount = boardEls(board.id).mount;
         if (!mount) return;
 
         const grouped = {};
@@ -366,7 +392,8 @@
 
       const title = document.createElement('h3');
       title.className = 'flex-1 truncate font-mono text-[11px] uppercase tracking-[0.15em] text-ink';
-      title.textContent = meta.id;
+      title.textContent = meta.label || meta.id;
+      if (meta.label) title.title = meta.id;   // kısaltılmışsa tam adı ipucunda göster
 
       const badge = document.createElement('span');
       badge.className = 'rounded-full bg-white/5 px-2 py-0.5 font-mono text-[10px] tabular-nums text-muted';
@@ -439,7 +466,7 @@
       DOM.statsPill.classList.toggle('inline-flex', total > 0);
 
       CONFIG.BOARDS.forEach((board) => {
-        const el = document.getElementById(board.countEl);
+        const el = boardEls(board.id).count;
         if (el) el.textContent = String(State.countForBoard(board.id));
       });
     },
@@ -699,9 +726,9 @@
         const b = BOARD_OF[t.category];
         perBoard[b] = (perBoard[b] || 0) + 1;
       });
-      const parts = [];
-      if (perBoard.kisisel) parts.push(perBoard.kisisel + ' kişisel');
-      if (perBoard.gelistirme) parts.push(perBoard.gelistirme + ' geliştirme');
+      const parts = CONFIG.BOARDS
+        .filter((b) => perBoard[b.id])
+        .map((b) => perBoard[b.id] + ' ' + b.label.toLocaleLowerCase('tr'));
       Toast.success(created.length + ' görev eklendi (' + parts.join(', ') + ').');
     } catch (error) {
       const message = error && error.message ? error.message : 'Beklenmeyen bir hata oluştu.';
@@ -727,12 +754,16 @@
     });
 
     DOM.errorBannerClose.addEventListener('click', UI.hideError);
-    DOM.toggleKisisel.addEventListener('click', Collapse.toggle);
 
-    /* --- panolar (olay delegasyonu, iki bölüm için de) --- */
+    /* --- panolar (olay delegasyonu, her bölüm için) --- */
     CONFIG.BOARDS.forEach((board) => {
-      const mount = document.getElementById(board.mount);
+      const els = boardEls(board.id);
+      const mount = els.mount;
       if (!mount) return;
+
+      if (els.toggle) {
+        els.toggle.addEventListener('click', () => Collapse.toggle(board.id));
+      }
 
       // Sürükleme biter bitmez gelen tık, etiketin onay kutusunu işaretlemesine
       // yol açmasın diye yakalama aşamasında yutulur.
@@ -827,7 +858,7 @@
   function init() {
     State.hydrate();
     bindEvents();
-    Collapse.apply(Collapse.isCollapsed());
+    Collapse.applyAll();
     UI.renderBoards();
     UI.updateCharCount();
   }
