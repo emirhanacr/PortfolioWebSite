@@ -26,6 +26,8 @@ document.getElementById('footer-root').outerHTML = `
       <a href="https://emirhan-acar.itch.io/" target="_blank" rel="noopener noreferrer" class="border border-white/15 px-4 py-2 font-mono text-[11px] tracking-[0.2em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent focus-ring">itch.io</a>
       <a href="https://www.linkedin.com/in/emirhan-acar-972429223" target="_blank" rel="noopener noreferrer" class="border border-white/15 px-4 py-2 font-mono text-[11px] tracking-[0.2em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent focus-ring">LinkedIn</a>
       <a href="https://github.com/emirhanacr" target="_blank" rel="noopener noreferrer" class="border border-white/15 px-4 py-2 font-mono text-[11px] tracking-[0.2em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent focus-ring">GitHub</a>
+      <!-- Site içi araç. Header menüsü mobilde gizli olduğu için asıl mobil giriş noktası burası. -->
+      <a href="gorev-ayristirici.html" class="border border-white/15 px-4 py-2 font-mono text-[11px] tracking-[0.2em] uppercase text-muted transition-colors duration-300 hover:text-ink hover:border-accent focus-ring">Ayrıştırıcı</a>
     </div>
 
     <div class="pt-10 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-t border-white/10 font-mono text-[10px] sm:text-[11px] tracking-widest text-muted uppercase">
