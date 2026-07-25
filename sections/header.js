@@ -12,6 +12,7 @@ document.getElementById('header-root').outerHTML = `
     <ul class="hidden md:flex items-center justify-self-center gap-1 font-mono text-[11px] tracking-[0.2em] uppercase">
       <li><a href="#" class="block rounded-full px-3 py-2 text-muted transition-colors duration-300 hover:text-ink hover:bg-white/5 focus-ring">Anasayfa</a></li>
       <li><a href="#projects" class="block rounded-full px-3 py-2 text-muted transition-colors duration-300 hover:text-ink hover:bg-white/5 focus-ring">Projeler</a></li>
+      <li><a href="gorev-ayristirici.html" class="block rounded-full px-3 py-2 text-muted transition-colors duration-300 hover:text-ink hover:bg-white/5 focus-ring">Ayrıştırıcı</a></li>
     </ul>
 
     <!-- İletişim butonu -->

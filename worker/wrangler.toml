@@ -1,0 +1,10 @@
+name = "gorev-ayristirici-api"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Log ve metrikleri açar — kötüye kullanımı fark etmek için gerekli.
+[observability]
+enabled = true
+
+# API anahtarı BURAYA YAZILMAZ. Secret olarak tanımlanır:
+#   npx wrangler secret put OPENROUTER_API_KEY

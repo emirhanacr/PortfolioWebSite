@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Görev Ayrıştırıcı — Portfolio</title>
+<meta name="description" content="Dağınık notlarını yapay zeka ile yapılandırılmış görev listesine dönüştür." />
+
+<link rel="icon" type="image/png" href="favicon.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="scripts/tailwind-config.js"></script>
+
+<!-- Phosphor ikonlar (sadece CSS, sürüm sabitlenmiş) -->
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+
+<link rel="stylesheet" href="styles/main.css" />
+</head>
+
+<body class="bg-base text-ink font-body antialiased">
+
+  <div id="header-root"></div>
+
+  <main class="relative bg-base pt-32 pb-24 sm:pt-40 sm:pb-32">
+    <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+
+      <!-- ============ BAŞLIK ============ -->
+      <div class="mb-10 sm:mb-14">
+        <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-accent">Deneysel Araç</p>
+        <h1 class="font-display text-3xl font-bold tracking-tight text-ink sm:text-5xl">
+          Görev Ayrıştırıcı
+        </h1>
+        <!-- Dikkat: temada "base" adlı bir renk olduğu için `text-base` font boyutu
+             değil RENK üretir. Boyut için arbitrary değer kullanılıyor. -->
+        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-[1rem]">
+          Aklındaki her şeyi dağınık halde yaz. Yapay zeka bunu ayrı ayrı görevlere böler,
+          kategorilere yerleştirir ve karşına düzenli bir pano çıkarır.
+        </p>
+      </div>
+
+      <!-- ============ GİRDİ ============ -->
+      <section class="mb-8 overflow-hidden rounded-2xl border border-white/10 bg-panel">
+        <div class="flex items-center gap-2 border-b border-white/10 px-5 py-3">
+          <i class="ph ph-scribble-loop text-accent"></i>
+          <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">Beyin Fırtınası</span>
+        </div>
+
+        <div class="p-5">
+          <textarea id="taskInput" rows="5" maxlength="2000"
+            placeholder="Örn: Yarın Ahmet'e sunum dosyasını yolla, elektrik faturasını öde, akşam spora git, acil olarak vergi danışmanını ara."
+            class="min-h-[120px] w-full resize-y rounded-xl border border-white/10 bg-base p-4 text-sm leading-relaxed text-ink placeholder-muted/60 transition focus:border-accent/60 focus:outline-none focus-ring"></textarea>
+
+          <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="order-2 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.15em] text-muted sm:order-1">
+              <span id="charCount" class="tabular-nums">0 / 2000</span>
+              <span class="hidden text-white/15 sm:inline">|</span>
+              <span class="hidden sm:inline">Ctrl + Enter</span>
+            </div>
+
+            <button id="parseBtn" type="button"
+              class="group order-1 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-accent px-7 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-base transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 focus-ring sm:order-2 sm:w-auto">
+              <i id="parseBtnIcon" class="ph-bold ph-sparkle text-sm"></i>
+              <span id="parseBtnLabel">Ayrıştır</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ HATA ============ -->
+      <div id="errorBanner" class="mb-8 hidden">
+        <div class="flex items-start gap-3 rounded-2xl border border-red-500/25 bg-red-500/5 p-4 sm:p-5">
+          <i class="ph-fill ph-warning-circle mt-0.5 text-lg text-red-400"></i>
+          <div class="min-w-0 flex-1">
+            <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-red-400">Hata</p>
+            <p id="errorBannerText" class="mt-1.5 break-words text-sm text-ink/80"></p>
+          </div>
+          <button id="errorBannerClose" type="button" aria-label="Kapat"
+            class="shrink-0 rounded-full p-1.5 text-red-400/60 transition hover:bg-red-500/10 hover:text-red-400 focus-ring">
+            <i class="ph ph-x text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ PANO ARAÇ ÇUBUĞU ============ -->
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-muted">Pano</span>
+          <span id="statsPill" class="hidden items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted">
+            <i class="ph-fill ph-check-circle text-accent"></i>
+            <span id="statsText" class="tabular-nums">0 / 0</span>
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="clearCompletedBtn" type="button"
+            class="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition-colors duration-300 hover:border-white/25 hover:text-ink focus-ring">
+            <i class="ph ph-broom text-xs"></i> Tamamlananlar
+          </button>
+          <button id="clearAllBtn" type="button" data-armed="false"
+            class="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition-colors duration-300 hover:border-red-500/40 hover:text-red-400 focus-ring">
+            <i id="clearAllIcon" class="ph ph-trash text-xs"></i>
+            <span id="clearAllLabel">Tümünü Sil</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ PANO ============ -->
+      <section id="board" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"></section>
+
+      <!-- ============ GİZLİLİK NOTU ============ -->
+      <p class="mt-10 flex items-start gap-2 text-xs leading-relaxed text-muted/70">
+        <i class="ph ph-info mt-0.5 shrink-0"></i>
+        <span>
+          Yazdığın metin, ayrıştırılmak üzere yapay zeka servisine (OpenRouter) gönderilir.
+          Oluşan görevler yalnızca kendi tarayıcında saklanır, sunucuya kaydedilmez.
+          Hassas bilgi girmemeni öneririm.
+        </span>
+      </p>
+
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <!-- Bildirimler -->
+  <div id="toastContainer" aria-live="polite" aria-atomic="true"
+    class="pointer-events-none fixed bottom-5 right-5 z-[60] flex w-[calc(100%-2.5rem)] max-w-sm flex-col gap-3"></div>
+
+  <script src="sections/header.js"></script>
+  <script src="sections/footer.js"></script>
+  <script src="scripts/gorev-ayristirici.js"></script>
+
+</body>
+</html>
