@@ -39,8 +39,9 @@
         <!-- Dikkat: temada "base" adlı bir renk olduğu için `text-base` font boyutu
              değil RENK üretir. Boyut için arbitrary değer kullanılıyor. -->
         <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-[1rem]">
-          Aklındaki her şeyi dağınık halde yaz. Yapay zeka bunu ayrı ayrı görevlere böler,
-          kategorilere yerleştirir ve karşına düzenli bir pano çıkarır.
+          Aklındaki her şeyi dağınık halde yaz — günlük işler ve oyun geliştirme notları
+          aynı paragrafta olabilir. Yapay zeka bunları ayrı görevlere böler, doğru panoya
+          yerleştirir. Sonrasında maddeleri sürükleyerek istediğin yere taşıyabilirsin.
         </p>
       </div>
 
@@ -53,7 +54,7 @@
 
         <div class="p-5">
           <textarea id="taskInput" rows="5" maxlength="2000"
-            placeholder="Örn: Yarın Ahmet'e sunum dosyasını yolla, elektrik faturasını öde, akşam spora git, acil olarak vergi danışmanını ara."
+            placeholder="Örn: envanter ekranında item duplicate oluyor, kira ödemesini yap, save sistemi test edilmeli, yarın sunum var, ana menüye ayarlar sekmesi eklenecek."
             class="min-h-[120px] w-full resize-y rounded-xl border border-white/10 bg-base p-4 text-sm leading-relaxed text-ink placeholder-muted/60 transition focus:border-accent/60 focus:outline-none focus-ring"></textarea>
 
           <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -110,8 +111,32 @@
         </div>
       </div>
 
-      <!-- ============ PANO ============ -->
-      <section id="board" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"></section>
+      <!-- ============ KİŞİSEL BÖLÜM ============ -->
+      <section id="section-kisisel" class="mb-10">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-2">
+          <div class="flex items-center gap-2.5">
+            <i class="ph-bold ph-user-list text-sm text-accent"></i>
+            <h2 class="font-mono text-[11px] uppercase tracking-[0.25em] text-ink">Kişisel</h2>
+            <span id="countKisisel" class="rounded-full bg-white/5 px-2 py-0.5 font-mono text-[10px] tabular-nums text-muted">0</span>
+          </div>
+          <button id="toggleKisisel" type="button" aria-expanded="true" aria-controls="board-kisisel"
+            class="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition-colors duration-300 hover:border-white/25 hover:text-ink focus-ring">
+            <i id="toggleKisiselIcon" class="ph ph-caret-up text-xs"></i>
+            <span id="toggleKisiselLabel">Kısalt</span>
+          </button>
+        </div>
+        <div id="board-kisisel" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"></div>
+      </section>
+
+      <!-- ============ GELİŞTİRME BÖLÜM ============ -->
+      <section id="section-gelistirme">
+        <div class="mb-3 flex items-center gap-2.5 border-b border-white/10 pb-2">
+          <i class="ph-bold ph-game-controller text-sm text-accent"></i>
+          <h2 class="font-mono text-[11px] uppercase tracking-[0.25em] text-ink">Geliştirme</h2>
+          <span id="countGelistirme" class="rounded-full bg-white/5 px-2 py-0.5 font-mono text-[10px] tabular-nums text-muted">0</span>
+        </div>
+        <div id="board-gelistirme" class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"></div>
+      </section>
 
       <!-- ============ GİZLİLİK NOTU ============ -->
       <p class="mt-10 flex items-start gap-2 text-xs leading-relaxed text-muted/70">

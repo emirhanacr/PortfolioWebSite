@@ -28,11 +28,13 @@ const MAX_TASKS = 40;           // tek yanıtta kabul edilen azami görev
 const RATE_LIMIT_MAX = 15;      // pencere başına istek
 const RATE_LIMIT_WINDOW = 3600; // saniye (1 saat)
 
-const CATEGORIES = ['İş', 'Kişisel', 'Finans', 'Acil', 'Diğer'];
+// Sekiz kategori, iki bölüm: ilk beşi kişisel panoya, son üçü geliştirme panosuna
+// düşer. Bölüm bilgisi ayrıca taşınmaz — istemci kategoriden türetir.
+const CATEGORIES = ['İş', 'Kişisel', 'Finans', 'Acil', 'Diğer', 'Bug', 'Eklenecek', 'Test'];
 const FALLBACK_CATEGORY = 'Diğer';
 
-// Birebir, değiştirilmeden.
-const SYSTEM_PROMPT = "Sen yalnızca yapılandırılmış veri üreten bir veri ayrıştırma motorusun. Sohbet etme, açıklama yapma. Girdi metnindeki görevleri çıkar, eğer birden fazlaysa böl. 'İş', 'Kişisel', 'Finans', 'Acil', 'Diğer' kategorilerinden birine ata. SADECE VE SADECE geçerli bir JSON array formatında yanıt ver. Markdown (```json) KULLANMA. Şablon: [{'task': 'görev tanımı', 'category': 'Kategori'}]. Görev yoksa [] dön.";
+// Tek paragrafın her iki panoyu birden besleyebilmesi için birleşik prompt.
+const SYSTEM_PROMPT = "Sen yalnızca yapılandırılmış veri üreten bir veri ayrıştırma motorusun. Sohbet etme, açıklama yapma. Girdi metnindeki görevleri çıkar, eğer birden fazlaysa böl. Her görevi şu kategorilerden birine ata: günlük işler için 'İş', 'Kişisel', 'Finans', 'Acil', 'Diğer'; oyun geliştirme işleri için 'Bug', 'Eklenecek', 'Test'. 'Bug' = düzeltilmesi gereken hata veya arıza. 'Eklenecek' = yeni özellik, içerik veya iyileştirme. 'Test' = denenmesi veya doğrulanması gereken şey. Kategorisi belirsizse 'Diğer' kullan. SADECE VE SADECE geçerli bir JSON array formatında yanıt ver. Markdown (```json) KULLANMA. Şablon: [{'task': 'görev tanımı', 'category': 'Kategori'}]. Görev yoksa [] dön.";
 
 /* ============================ GİRİŞ ============================ */
 

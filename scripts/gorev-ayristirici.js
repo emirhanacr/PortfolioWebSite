@@ -4,32 +4,66 @@
  * Burada API anahtarı YOKTUR ve olmamalıdır. Sayfa yalnızca kendi proxy'mize
  * { text } gönderir; model, system prompt ve anahtar Cloudflare Worker'da durur.
  * Worker kaynağı: worker/worker.js
+ *
+ * İki pano tek sayfada: üstte kişisel (5 kategori), altta geliştirme (3 kategori).
+ * Hangi görevin hangi panoya ait olduğu KATEGORİDEN TÜRETİLİR — kayıtlarda ayrıca
+ * saklanmaz. Bu sayede eski kayıtlar şema değişmeden geçerli kalır ve sürükle-bırak
+ * yalnızca `category` alanını değiştirir.
  */
 (function () {
   'use strict';
 
   /* ============================================================
-   * AYAR — deploy sonrası burayı doldur
+   * AYAR
    * ========================================================== */
   const CONFIG = Object.freeze({
-    // `npx wrangler deploy` çıktısındaki adres. Örn:
-    //   https://gorev-ayristirici-api.KULLANICI_ADIN.workers.dev
+    // `npx wrangler deploy` / Cloudflare paneli çıktısındaki adres.
     API_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev',
 
     STORAGE_KEY: 'gorev_ayristirici_tasks',
+    COLLAPSE_KEY: 'gorev_ayristirici_collapsed',
     MAX_INPUT_CHARS: 2000,
 
-    CATEGORIES: Object.freeze([
-      { id: 'İş',      icon: 'ph-briefcase',              tone: 'text-accent',   rule: 'from-accent/40' },
-      { id: 'Kişisel', icon: 'ph-user',                   tone: 'text-accent',   rule: 'from-accent/40' },
-      { id: 'Finans',  icon: 'ph-currency-circle-dollar', tone: 'text-accent',   rule: 'from-accent/40' },
-      { id: 'Acil',    icon: 'ph-warning',                tone: 'text-red-400',  rule: 'from-red-500/40' },
-      { id: 'Diğer',   icon: 'ph-dots-three-circle',      tone: 'text-muted',    rule: 'from-white/20' },
+    BOARDS: Object.freeze([
+      {
+        id: 'kisisel',
+        mount: 'board-kisisel',
+        countEl: 'countKisisel',
+        grid: 'xl',
+        categories: Object.freeze([
+          { id: 'İş',      icon: 'ph-briefcase',              tone: 'text-accent',  rule: 'from-accent/40' },
+          { id: 'Kişisel', icon: 'ph-user',                   tone: 'text-accent',  rule: 'from-accent/40' },
+          { id: 'Finans',  icon: 'ph-currency-circle-dollar', tone: 'text-accent',  rule: 'from-accent/40' },
+          { id: 'Acil',    icon: 'ph-warning',                tone: 'text-red-400', rule: 'from-red-500/40' },
+          { id: 'Diğer',   icon: 'ph-dots-three-circle',      tone: 'text-muted',   rule: 'from-white/20' },
+        ]),
+      },
+      {
+        id: 'gelistirme',
+        mount: 'board-gelistirme',
+        countEl: 'countGelistirme',
+        grid: 'md',
+        categories: Object.freeze([
+          { id: 'Bug',       icon: 'ph-bug',         tone: 'text-red-400', rule: 'from-red-500/40' },
+          { id: 'Eklenecek', icon: 'ph-plus-circle', tone: 'text-accent',  rule: 'from-accent/40' },
+          { id: 'Test',      icon: 'ph-flask',       tone: 'text-accent',  rule: 'from-accent/40' },
+        ]),
+      },
     ]),
   });
 
-  const VALID_CATEGORIES = CONFIG.CATEGORIES.map((c) => c.id);
   const FALLBACK_CATEGORY = 'Diğer';
+
+  // Kategori -> meta ve kategori -> pano eşlemeleri, tek kaynaktan türetilir.
+  const CATEGORY_META = {};
+  const BOARD_OF = {};
+  CONFIG.BOARDS.forEach((board) => {
+    board.categories.forEach((cat) => {
+      CATEGORY_META[cat.id] = cat;
+      BOARD_OF[cat.id] = board.id;
+    });
+  });
+  const VALID_CATEGORIES = Object.keys(CATEGORY_META);
 
   const LABEL_BASE = 'min-w-0 flex-1 cursor-pointer break-words text-sm leading-relaxed text-ink/85 transition';
   const LABEL_DONE = 'line-through opacity-40';
@@ -48,7 +82,6 @@
     errorBannerText: document.getElementById('errorBannerText'),
     errorBannerClose: document.getElementById('errorBannerClose'),
 
-    board: document.getElementById('board'),
     statsPill: document.getElementById('statsPill'),
     statsText: document.getElementById('statsText'),
 
@@ -56,6 +89,11 @@
     clearAllBtn: document.getElementById('clearAllBtn'),
     clearAllIcon: document.getElementById('clearAllIcon'),
     clearAllLabel: document.getElementById('clearAllLabel'),
+
+    boardKisisel: document.getElementById('board-kisisel'),
+    toggleKisisel: document.getElementById('toggleKisisel'),
+    toggleKisiselIcon: document.getElementById('toggleKisiselIcon'),
+    toggleKisiselLabel: document.getElementById('toggleKisiselLabel'),
 
     toastContainer: document.getElementById('toastContainer'),
   };
@@ -106,13 +144,23 @@
       }));
       State.tasks = State.tasks.concat(created);
       State.persist();
-      return created.length;
+      return created;
     },
 
     toggle(id) {
       const task = State.tasks.find((t) => t.id === id);
       if (!task) return null;
       task.completed = !task.completed;
+      State.persist();
+      return task;
+    },
+
+    /** Sürükle-bırak sonucu: sadece kategori değişir, pano ondan türetilir. */
+    move(id, category) {
+      if (!VALID_CATEGORIES.includes(category)) return null;
+      const task = State.tasks.find((t) => t.id === id);
+      if (!task || task.category === category) return null;
+      task.category = category;
       State.persist();
       return task;
     },
@@ -143,6 +191,10 @@
         total: State.tasks.length,
         done: State.tasks.filter((t) => t.completed).length,
       };
+    },
+
+    countForBoard(boardId) {
+      return State.tasks.filter((t) => BOARD_OF[t.category] === boardId).length;
     },
   };
 
@@ -253,28 +305,55 @@
   };
 
   /* ============================================================
+   * Kısaltma (üst bölüm)
+   * ========================================================== */
+  const Collapse = {
+    isCollapsed() { return Storage.read(CONFIG.COLLAPSE_KEY, false) === true; },
+
+    apply(collapsed) {
+      DOM.boardKisisel.classList.toggle('hidden', collapsed);
+      DOM.toggleKisiselIcon.className = 'ph ' + (collapsed ? 'ph-caret-down' : 'ph-caret-up') + ' text-xs';
+      DOM.toggleKisiselLabel.textContent = collapsed ? 'Göster' : 'Kısalt';
+      DOM.toggleKisisel.setAttribute('aria-expanded', String(!collapsed));
+    },
+
+    toggle() {
+      const next = !Collapse.isCollapsed();
+      Storage.write(CONFIG.COLLAPSE_KEY, next);
+      Collapse.apply(next);
+    },
+  };
+
+  /* ============================================================
    * UI
    * ========================================================== */
   const UI = {
-    renderBoard() {
-      const grouped = State.tasks.reduce((acc, task) => {
-        const key = VALID_CATEGORIES.includes(task.category) ? task.category : FALLBACK_CATEGORY;
-        (acc[key] = acc[key] || []).push(task);
-        return acc;
-      }, {});
+    renderBoards() {
+      CONFIG.BOARDS.forEach((board) => {
+        const mount = document.getElementById(board.mount);
+        if (!mount) return;
 
-      const fragment = document.createDocumentFragment();
-      CONFIG.CATEGORIES.forEach((meta) => {
-        fragment.appendChild(UI.createColumn(meta, grouped[meta.id] || []));
+        const grouped = {};
+        board.categories.forEach((cat) => { grouped[cat.id] = []; });
+        State.tasks.forEach((task) => {
+          if (grouped[task.category]) grouped[task.category].push(task);
+        });
+
+        const fragment = document.createDocumentFragment();
+        board.categories.forEach((cat) => {
+          fragment.appendChild(UI.createColumn(cat, grouped[cat.id]));
+        });
+        mount.replaceChildren(fragment);
       });
 
-      DOM.board.replaceChildren(fragment);
       UI.updateStats();
     },
 
     createColumn(meta, tasks) {
       const column = document.createElement('div');
-      column.className = 'flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-panel';
+      column.className = 'flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-panel transition-colors';
+      // Sürükle-bırak hedefi olarak bu öznitelik kullanılıyor.
+      column.dataset.category = meta.id;
 
       const rule = document.createElement('div');
       rule.className = 'h-px w-full bg-gradient-to-r to-transparent ' + meta.rule;
@@ -285,7 +364,7 @@
       const icon = document.createElement('i');
       icon.className = 'ph-bold ' + meta.icon + ' text-sm ' + meta.tone;
 
-      const title = document.createElement('h2');
+      const title = document.createElement('h3');
       title.className = 'flex-1 truncate font-mono text-[11px] uppercase tracking-[0.15em] text-ink';
       title.textContent = meta.id;
 
@@ -346,7 +425,7 @@
 
     /** Tek satırı yerinde günceller — tüm panoyu yeniden çizmez. */
     paintTask(id, completed) {
-      const row = DOM.board.querySelector('[data-id="' + CSS.escape(id) + '"]');
+      const row = document.querySelector('[data-id="' + CSS.escape(id) + '"]');
       if (!row) return;
       const label = row.querySelector('[data-role="label"]');
       if (label) label.className = LABEL_BASE + (completed ? ' ' + LABEL_DONE : '');
@@ -358,6 +437,11 @@
       DOM.statsText.textContent = done + ' / ' + total;
       DOM.statsPill.classList.toggle('hidden', total === 0);
       DOM.statsPill.classList.toggle('inline-flex', total > 0);
+
+      CONFIG.BOARDS.forEach((board) => {
+        const el = document.getElementById(board.countEl);
+        if (el) el.textContent = String(State.countForBoard(board.id));
+      });
     },
 
     updateCharCount() {
@@ -384,6 +468,195 @@
       DOM.errorBannerText.textContent = '';
     },
   };
+
+  /* ============================================================
+   * Sürükle-bırak — Pointer Events (fare + dokunmatik)
+   *
+   * Fare:       ~6px hareket eşiği aşılınca başlar.
+   * Dokunmatik: ~250ms basılı tutulunca başlar; erken hareket olursa sayfa
+   *             kaydırması olarak yorumlanıp sürükleme iptal edilir.
+   * ========================================================== */
+  const DRAG_THRESHOLD = 6;
+  const HOLD_MS = 250;
+  const EDGE_ZONE = 70;   // kenara bu kadar yaklaşınca otomatik kaydır
+  const EDGE_SPEED = 12;
+
+  const DragDrop = {
+    pending: null,
+    active: null,
+    lastDragEnd: 0,
+
+    onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (DragDrop.active) return;
+
+      const row = e.target.closest('li[data-id]');
+      if (!row) return;
+      // Onay kutusu ve silme butonu sürüklemeyi başlatmaz.
+      if (e.target.closest('input, button')) return;
+
+      const rect = row.getBoundingClientRect();
+      const pending = {
+        row,
+        id: row.dataset.id,
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top,
+        width: rect.width,
+        touch: e.pointerType !== 'mouse',
+        holdTimer: null,
+      };
+      DragDrop.pending = pending;
+
+      if (pending.touch) {
+        pending.holdTimer = setTimeout(() => {
+          if (DragDrop.pending === pending) DragDrop.start(pending, pending.startX, pending.startY);
+        }, HOLD_MS);
+      }
+    },
+
+    onPointerMove(e) {
+      const p = DragDrop.pending;
+      if (p && e.pointerId === p.pointerId) {
+        const dist = Math.hypot(e.clientX - p.startX, e.clientY - p.startY);
+        if (p.touch) {
+          // Basılı tutma dolmadan hareket = kaydırma niyeti, sürüklemeyi iptal et.
+          if (dist > 10) DragDrop.clearPending();
+        } else if (dist > DRAG_THRESHOLD) {
+          DragDrop.start(p, e.clientX, e.clientY);
+        }
+        return;
+      }
+
+      const a = DragDrop.active;
+      if (!a || e.pointerId !== a.pointerId) return;
+
+      e.preventDefault();
+      DragDrop.moveGhost(e.clientX, e.clientY);
+      DragDrop.updateTarget(e.clientX, e.clientY);
+      DragDrop.edgeScroll(e.clientY);
+    },
+
+    onPointerUp(e) {
+      const p = DragDrop.pending;
+      if (p && e.pointerId === p.pointerId) DragDrop.clearPending();
+
+      const a = DragDrop.active;
+      if (!a || e.pointerId !== a.pointerId) return;
+
+      const targetCategory = a.target ? a.target.dataset.category : null;
+      DragDrop.finish();
+
+      if (targetCategory) {
+        const moved = State.move(a.id, targetCategory);
+        if (moved) {
+          UI.renderBoards();
+          Toast.success('"' + shorten(moved.task) + '" → ' + targetCategory);
+        }
+      }
+    },
+
+    onPointerCancel(e) {
+      const p = DragDrop.pending;
+      if (p && e.pointerId === p.pointerId) DragDrop.clearPending();
+      if (DragDrop.active && e.pointerId === DragDrop.active.pointerId) DragDrop.finish();
+    },
+
+    clearPending() {
+      if (DragDrop.pending && DragDrop.pending.holdTimer) clearTimeout(DragDrop.pending.holdTimer);
+      DragDrop.pending = null;
+    },
+
+    start(pending, x, y) {
+      DragDrop.clearPending();
+
+      const ghost = pending.row.cloneNode(true);
+      // Klon zaten textContent ile kurulmuş düğümlerden geliyor — XSS yüzeyi yok.
+      ghost.style.position = 'fixed';
+      ghost.style.width = pending.width + 'px';
+      ghost.style.left = (x - pending.offsetX) + 'px';
+      ghost.style.top = (y - pending.offsetY) + 'px';
+      ghost.style.pointerEvents = 'none';
+      ghost.style.zIndex = '70';
+      ghost.style.transform = 'rotate(1.5deg) scale(1.02)';
+      ghost.className += ' rounded-xl border border-accent/50 bg-panel shadow-[0_20px_50px_-12px_rgba(0,0,0,0.9)]';
+      document.body.appendChild(ghost);
+
+      pending.row.classList.add('opacity-30');
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'grabbing';
+
+      DragDrop.active = {
+        id: pending.id,
+        row: pending.row,
+        ghost,
+        pointerId: pending.pointerId,
+        offsetX: pending.offsetX,
+        offsetY: pending.offsetY,
+        target: null,
+      };
+
+      try { pending.row.setPointerCapture(pending.pointerId); } catch (_) { /* önemsiz */ }
+
+      DragDrop.updateTarget(x, y);
+    },
+
+    moveGhost(x, y) {
+      const a = DragDrop.active;
+      a.ghost.style.left = (x - a.offsetX) + 'px';
+      a.ghost.style.top = (y - a.offsetY) + 'px';
+    },
+
+    /**
+     * Hedef kolonu her harekette yeniden hesaplar. Kolon sayısı en fazla 8
+     * olduğu için maliyeti önemsiz; kaydırma sırasında bayatlamayı önler.
+     */
+    updateTarget(x, y) {
+      const a = DragDrop.active;
+      const columns = document.querySelectorAll('[data-category]');
+      let found = null;
+
+      for (const col of columns) {
+        if (col.offsetParent === null) continue;   // kısaltılmış bölüm
+        const r = col.getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) { found = col; break; }
+      }
+
+      if (found === a.target) return;
+      if (a.target) a.target.classList.remove('border-accent', 'bg-accent/5');
+      a.target = found;
+      if (found) found.classList.add('border-accent', 'bg-accent/5');
+    },
+
+    edgeScroll(y) {
+      if (y < EDGE_ZONE) window.scrollBy(0, -EDGE_SPEED);
+      else if (y > window.innerHeight - EDGE_ZONE) window.scrollBy(0, EDGE_SPEED);
+    },
+
+    finish() {
+      const a = DragDrop.active;
+      if (!a) return;
+      try { a.row.releasePointerCapture(a.pointerId); } catch (_) { /* önemsiz */ }
+      if (a.target) a.target.classList.remove('border-accent', 'bg-accent/5');
+      a.ghost.remove();
+      a.row.classList.remove('opacity-30');
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      DragDrop.active = null;
+      DragDrop.lastDragEnd = Date.now();
+    },
+
+    /** Sürükleme bittikten hemen sonraki tık, etiketin kutuyu işaretlemesini engellemek için yutulur. */
+    swallowsClick() {
+      return Date.now() - DragDrop.lastDragEnd < 250;
+    },
+  };
+
+  function shorten(text) {
+    return text.length > 32 ? text.slice(0, 32) + '…' : text;
+  }
 
   /* ============================================================
    * Ana akış
@@ -415,11 +688,21 @@
         return;
       }
 
-      const added = State.addTasks(parsed);
-      UI.renderBoard();
+      const created = State.addTasks(parsed);
+      UI.renderBoards();
       DOM.taskInput.value = '';
       UI.updateCharCount();
-      Toast.success(added + ' görev eklendi.');
+
+      // Hangi bölüme kaç madde düştüğünü bildir — biri kısaltılmışsa fark edilsin.
+      const perBoard = {};
+      created.forEach((t) => {
+        const b = BOARD_OF[t.category];
+        perBoard[b] = (perBoard[b] || 0) + 1;
+      });
+      const parts = [];
+      if (perBoard.kisisel) parts.push(perBoard.kisisel + ' kişisel');
+      if (perBoard.gelistirme) parts.push(perBoard.gelistirme + ' geliştirme');
+      Toast.success(created.length + ' görev eklendi (' + parts.join(', ') + ').');
     } catch (error) {
       const message = error && error.message ? error.message : 'Beklenmeyen bir hata oluştu.';
       UI.showError(message);
@@ -434,7 +717,6 @@
    * ========================================================== */
   function bindEvents() {
     DOM.parseBtn.addEventListener('click', processText);
-
     DOM.taskInput.addEventListener('input', UI.updateCharCount);
 
     DOM.taskInput.addEventListener('keydown', (e) => {
@@ -445,24 +727,54 @@
     });
 
     DOM.errorBannerClose.addEventListener('click', UI.hideError);
+    DOM.toggleKisisel.addEventListener('click', Collapse.toggle);
 
-    /* --- pano (olay delegasyonu) --- */
-    DOM.board.addEventListener('change', (e) => {
-      if (!e.target || e.target.dataset.action !== 'toggle') return;
-      const row = e.target.closest('[data-id]');
-      if (!row) return;
-      const task = State.toggle(row.dataset.id);
-      if (task) UI.paintTask(task.id, task.completed);
+    /* --- panolar (olay delegasyonu, iki bölüm için de) --- */
+    CONFIG.BOARDS.forEach((board) => {
+      const mount = document.getElementById(board.mount);
+      if (!mount) return;
+
+      // Sürükleme biter bitmez gelen tık, etiketin onay kutusunu işaretlemesine
+      // yol açmasın diye yakalama aşamasında yutulur.
+      mount.addEventListener('click', (e) => {
+        if (DragDrop.swallowsClick()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      mount.addEventListener('change', (e) => {
+        if (!e.target || e.target.dataset.action !== 'toggle') return;
+        const row = e.target.closest('[data-id]');
+        if (!row) return;
+        const task = State.toggle(row.dataset.id);
+        if (task) UI.paintTask(task.id, task.completed);
+      });
+
+      mount.addEventListener('click', (e) => {
+        const button = e.target.closest('[data-action="delete"]');
+        if (!button) return;
+        const row = button.closest('[data-id]');
+        if (row && State.remove(row.dataset.id)) {
+          UI.renderBoards();
+          Toast.info('Görev silindi.');
+        }
+      });
+
+      mount.addEventListener('pointerdown', DragDrop.onPointerDown);
     });
 
-    DOM.board.addEventListener('click', (e) => {
-      const button = e.target.closest('[data-action="delete"]');
-      if (!button) return;
-      const row = button.closest('[data-id]');
-      if (row && State.remove(row.dataset.id)) {
-        UI.renderBoard();
-        Toast.info('Görev silindi.');
-      }
+    document.addEventListener('pointermove', DragDrop.onPointerMove, { passive: false });
+    document.addEventListener('pointerup', DragDrop.onPointerUp);
+    document.addEventListener('pointercancel', DragDrop.onPointerCancel);
+
+    // Dokunmatikte sürükleme aktifken sayfa kaydırmasını kesin olarak engelle.
+    document.addEventListener('touchmove', (e) => {
+      if (DragDrop.active) e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && DragDrop.active) DragDrop.finish();
     });
 
     /* --- toplu işlemler --- */
@@ -472,7 +784,7 @@
         Toast.info('Tamamlanmış görev yok.');
         return;
       }
-      UI.renderBoard();
+      UI.renderBoards();
       Toast.success(removed + ' görev temizlendi.');
     });
 
@@ -504,7 +816,7 @@
 
       const removed = State.clearAll();
       disarm();
-      UI.renderBoard();
+      UI.renderBoards();
       Toast.success(removed + ' görev silindi.');
     });
   }
@@ -515,7 +827,8 @@
   function init() {
     State.hydrate();
     bindEvents();
-    UI.renderBoard();
+    Collapse.apply(Collapse.isCollapsed());
+    UI.renderBoards();
     UI.updateCharCount();
   }
 
