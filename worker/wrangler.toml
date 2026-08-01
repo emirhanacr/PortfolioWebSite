@@ -8,3 +8,11 @@ enabled = true
 
 # API anahtarı BURAYA YAZILMAZ. Secret olarak tanımlanır:
 #   npx wrangler secret put OPENROUTER_API_KEY
+
+# Paylaşılan görev panolarının (oda kodu -> görev listesi) saklandığı KV.
+# Namespace'i önce oluştur (dashboard veya `npx wrangler kv namespace create BOARDS`),
+# sonra buraya dönen id'yi yapıştır. Dashboard'dan bağlıyorsan bu blok kullanılmaz;
+# Worker → Settings → Bindings → KV Namespace, değişken adı "BOARDS" olacak şekilde ekle.
+[[kv_namespaces]]
+binding = "BOARDS"
+id = "e3839a81698a4b0abeb3165a90db23d0"

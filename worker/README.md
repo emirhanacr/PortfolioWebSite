@@ -60,7 +60,23 @@ Her iki yolda da sonuçta şu adresi alırsın:
 https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev
 ```
 
-### 3. Adresi siteye tanıt
+### 3. KV namespace'i oluştur ve bağla (paylaşımlı panolar için)
+
+Görev listeleri artık oda koduyla ilişkilendirilmiş şekilde Cloudflare KV'de
+saklanıyor. Bu adım olmadan `/board/*` uçları 500 döner (AI ayrıştırma etkilenmez).
+
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **KV**
+   → **Create a namespace** → isim: `gorev-ayristirici-boards`
+2. Worker sayfası (`gorev-ayristirici-api`) → **Settings** → **Bindings** →
+   **Add** → **KV Namespace**
+   - Variable name: `BOARDS`
+   - KV namespace: az önce oluşturduğun `gorev-ayristirici-boards`
+   - **Deploy**
+
+Wrangler CLI ile deploy ediyorsan bunun yerine `worker/wrangler.toml` içindeki
+`[[kv_namespaces]]` bloğuna namespace id'sini yapıştır.
+
+### 4. Adresi siteye tanıt
 
 `scripts/gorev-ayristirici.js` içindeki `API_ENDPOINT` değerini yukarıdaki
 adresle değiştir (`DEGISTIR` yazan yer):
@@ -69,7 +85,7 @@ adresle değiştir (`DEGISTIR` yazan yer):
 API_ENDPOINT: 'https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev',
 ```
 
-### 4. Siteyi yayınla
+### 5. Siteyi yayınla
 
 ```bash
 git add .
@@ -97,10 +113,28 @@ curl -X POST https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev \
   -H "Content-Type: application/json" \
   -H "Origin: https://kotu-site.com" \
   -d '{"text":"test"}'
+
+# Pano yazma (200 + tasks/updatedAt dönmeli) — kod 8 karakter, ABCDEFGH... alfabesinden
+curl -X PUT https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev/board/TEST2345 \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://www.emirhanacr.com" \
+  -d '{"tasks":[{"task":"deneme","category":"Diğer"}]}'
+
+# Pano okuma (200 dönmeli, yukarıdaki yazımı yansıtmalı)
+curl https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev/board/TEST2345 \
+  -H "Origin: https://www.emirhanacr.com"
+
+# Yanlış biçimli kod (400 dönmeli — küçük harf/uzunluk kurala uymuyor)
+curl https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev/board/yoktur \
+  -H "Origin: https://www.emirhanacr.com"
+
+# Biçimi doğru ama hiç yazılmamış kod (404 dönmeli)
+curl https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev/board/ZZZZ9999 \
+  -H "Origin: https://www.emirhanacr.com"
 ```
 
-Tarayıcıda `gorev-ayristirici.html` sayfasını aç, DevTools → Network sekmesinde
-isteğe bak: **`Authorization` başlığı görünmemeli.** Görünüyorsa bir şey yanlış.
+Tarayıcıda `/todo` sayfasını aç, DevTools → Network sekmesinde isteklere bak:
+**`Authorization` başlığı hiçbirinde görünmemeli.** Görünüyorsa bir şey yanlış.
 
 ---
 
@@ -115,6 +149,9 @@ isteğe bak: **`Authorization` başlığı görünmemeli.** Görünüyorsa bir �
 | Rate limit | `RATE_LIMIT_MAX` (15/saat/IP) | Otomatik kötüye kullanımı yavaşlatır |
 | Origin allowlist | `ALLOWED_ORIGINS` | Başka sitelerden gömülmeyi zorlaştırır |
 | Kredi limiti | OpenRouter paneli | **Asıl güvenlik ağı** |
+| Pano kodu formatı | `BOARD_CODE_RE` | Rastgele string'lerle KV'yi doldurmayı engeller |
+| Pano boyut/adet tavanı | `BOARD_MAX_TASKS`, `BOARD_MAX_BYTES` | KV depolama maliyetini sınırlar |
+| Pano TTL | `BOARD_TTL_SECONDS` (60 gün) | Terk edilmiş odalar otomatik silinir |
 
 **Kritik tasarım kuralı:** Worker istemciden gelen gövdeyi OpenRouter'a asla
 olduğu gibi iletmez. Sadece `text` alanını alır, isteği kendisi kurar. Bu kural
@@ -130,6 +167,13 @@ bedava bir LLM'e dönüşür.
   tarafında işe yarar, gerçek bir kimlik doğrulama değildir.
 - **Bot koruması yok.** Trafik artarsa Cloudflare Turnstile eklemek en etkili
   sonraki adım olur.
+- **Pano kodu = parola, gerçek kimlik doğrulama değil.** Kodu bilen herkes o
+  panoyu okuyup değiştirebilir. Kod tahmin edilemeyecek kadar uzun tutulur
+  (8 karakter, karışabilecek karakterler hariç ~40 bit) ama brute-force'a karşı
+  tek koruma bu ve okuma rate limitidir — hassas bilgi için tasarlanmadı.
+- **Son yazan kazanır.** İki kişi aynı anda farklı değişiklikler yaparsa, sunucuya
+  son ulaşan tam liste öncekinin üzerine yazar; sessizce kaybolan bir değişiklik
+  olabilir. Gerçek zamanlı çakışma çözümü (CRDT/Durable Objects) yok.
 
 ---
 
@@ -155,6 +199,11 @@ Hepsi `worker.js` dosyasının başında:
 |---|---|---|
 | `MODEL` | `deepseek/deepseek-chat` | Değiştirirsen fiyatı kontrol et |
 | `MAX_INPUT_CHARS` | 2000 | Sayfadaki `maxlength` ile eşleşmeli |
-| `RATE_LIMIT_MAX` | 15 | Pencere başına istek |
+| `RATE_LIMIT_MAX` | 15 | Pencere başına istek (AI ayrıştırma) |
 | `RATE_LIMIT_WINDOW` | 3600 | Saniye |
 | `ALLOWED_ORIGINS` | emirhanacr.com | Alan adı değişirse güncelle |
+| `BOARD_MAX_TASKS` | 300 | Pano başına azami görev |
+| `BOARD_MAX_BYTES` | 150.000 | Pano başına azami JSON boyutu |
+| `BOARD_TTL_SECONDS` | 60 gün | Hareketsiz panonun KV'den silinme süresi |
+| `BOARD_WRITE_RATE_LIMIT_MAX` | 60 | Pencere başına yazma isteği (IP) |
+| `BOARD_READ_RATE_LIMIT_MAX` | 1000 | Pencere başına okuma isteği — polling burayı besler |

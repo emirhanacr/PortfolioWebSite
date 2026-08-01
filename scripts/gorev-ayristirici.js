@@ -19,10 +19,15 @@
   const CONFIG = Object.freeze({
     // `npx wrangler deploy` / Cloudflare paneli çıktısındaki adres.
     API_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev',
+    // Aynı Worker'daki paylaşılan pano uçları — worker/worker.js → handleBoard.
+    BOARD_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev/board',
 
     STORAGE_KEY: 'gorev_ayristirici_tasks',
+    ROOM_CODE_KEY: 'gorev_ayristirici_room_code',
     COLLAPSE_PREFIX: 'gorev_ayristirici_collapsed_',
     MAX_INPUT_CHARS: 2000,
+    SYNC_POLL_MS: 5000,
+    SYNC_PUSH_DEBOUNCE_MS: 600,
 
     // DOM id'leri bölüm adından türetilir: board-X / count-X / toggle-X /
     // toggleIcon-X / toggleLabel-X. Yeni bölüm eklerken HTML'de aynı kalıba uy.
@@ -77,6 +82,19 @@
   });
   const VALID_CATEGORIES = Object.keys(CATEGORY_META);
 
+  // worker.js → BOARD_CODE_RE ile birebir aynı alfabe (0/O/1/I/L karışabildiği için hariç).
+  const ROOM_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+  const ROOM_CODE_RE = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{8}$/;
+
+  /** 256 % 32 === 0 olduğu için modulo önyargısı (bias) yok. */
+  function generateRoomCode() {
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    let code = '';
+    for (let i = 0; i < bytes.length; i++) code += ROOM_CODE_ALPHABET[bytes[i] % ROOM_CODE_ALPHABET.length];
+    return code;
+  }
+
   const LABEL_BASE = 'min-w-0 flex-1 cursor-pointer break-words text-sm leading-relaxed text-ink/85 transition';
   const LABEL_DONE = 'line-through opacity-40';
 
@@ -96,6 +114,16 @@
 
     statsPill: document.getElementById('statsPill'),
     statsText: document.getElementById('statsText'),
+
+    roomCodePill: document.getElementById('roomCodePill'),
+    roomCodeText: document.getElementById('roomCodeText'),
+    roomCodeCopyBtn: document.getElementById('roomCodeCopyBtn'),
+
+    joinCodeBtn: document.getElementById('joinCodeBtn'),
+    joinCodePanel: document.getElementById('joinCodePanel'),
+    joinCodeInput: document.getElementById('joinCodeInput'),
+    joinCodeConfirmBtn: document.getElementById('joinCodeConfirmBtn'),
+    joinCodeCancelBtn: document.getElementById('joinCodeCancelBtn'),
 
     clearCompletedBtn: document.getElementById('clearCompletedBtn'),
     clearAllBtn: document.getElementById('clearAllBtn'),
@@ -149,7 +177,13 @@
       State.tasks = Array.isArray(stored) ? stored.filter(isValidTask).map(normalizeTask) : [];
     },
 
-    persist() { Storage.write(CONFIG.STORAGE_KEY, State.tasks); },
+    persist() {
+      Storage.write(CONFIG.STORAGE_KEY, State.tasks);
+      Sync.schedulePush();
+    },
+
+    /** Sunucudan gelen veriyi yerel önbelleğe yazar — bulut yazımını TEKRAR tetiklemez. */
+    persistFromRemote() { Storage.write(CONFIG.STORAGE_KEY, State.tasks); },
 
     addTasks(incoming) {
       // Ham metin olduğu gibi saklanır; kaçış işlemi render sırasında yapılır.
@@ -323,6 +357,143 @@
   };
 
   /* ============================================================
+   * Sync — paylaşılan pano (oda kodu üzerinden Worker + KV)
+   *
+   * Her cihaz localStorage'da bir oda kodu tutar (yoksa otomatik üretilir).
+   * Yerel State değiştikçe debounce'lu olarak sunucuya PUT edilir; sekme
+   * görünürken birkaç saniyede bir GET ile diğer tarayıcılardaki değişiklikler
+   * çekilir. Sunucu = son yazan kazanır modeliyle "doğru" kabul edilir; bekleyen
+   * yerel bir yazım varken gelen poll sonucu uygulanmaz (yarım kalmasın diye).
+   * ========================================================== */
+  const Sync = {
+    code: null,
+    pushTimer: null,
+    pushQueued: false,
+    pushInFlight: false,
+    pollTimer: null,
+    lastKnownUpdatedAt: null,
+    failCount: 0,
+
+    init() {
+      let code = Storage.read(CONFIG.ROOM_CODE_KEY, null);
+      if (typeof code !== 'string' || !ROOM_CODE_RE.test(code)) {
+        code = generateRoomCode();
+        Storage.write(CONFIG.ROOM_CODE_KEY, code);
+      }
+      Sync.code = code;
+      UI.renderRoomCode(code);
+
+      Sync.pullInitial();
+      Sync.startPolling();
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          Sync.stopPolling();
+        } else {
+          Sync.startPolling();
+          Sync.pull();
+        }
+      });
+    },
+
+    url() { return CONFIG.BOARD_ENDPOINT + '/' + Sync.code; },
+
+    async pullInitial() {
+      try {
+        const response = await fetch(Sync.url());
+        if (response.status === 404) {
+          // Bu kod sunucuda henüz yok — yereldeki (varsa) görevler ilk kayıt olur.
+          Sync.schedulePush(0);
+          return;
+        }
+        if (!response.ok) return;
+        const data = await response.json();
+        Sync.applyRemote(data);
+      } catch (_) { /* sessiz — yerel veriyle devam edilir */ }
+    },
+
+    async pull() {
+      if (Sync.pushInFlight || Sync.pushQueued) return;
+      try {
+        const response = await fetch(Sync.url());
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.updatedAt !== Sync.lastKnownUpdatedAt) Sync.applyRemote(data);
+      } catch (_) { /* sessiz */ }
+    },
+
+    applyRemote(data) {
+      if (!data || !Array.isArray(data.tasks)) return;
+      Sync.lastKnownUpdatedAt = data.updatedAt;
+      State.tasks = data.tasks.filter(isValidTask).map(normalizeTask);
+      State.persistFromRemote();
+      UI.renderBoards();
+    },
+
+    schedulePush(delay) {
+      Sync.pushQueued = true;
+      clearTimeout(Sync.pushTimer);
+      Sync.pushTimer = setTimeout(
+        Sync.push,
+        typeof delay === 'number' ? delay : CONFIG.SYNC_PUSH_DEBOUNCE_MS
+      );
+    },
+
+    async push() {
+      if (Sync.pushInFlight) { Sync.pushQueued = true; return; }
+      Sync.pushQueued = false;
+      Sync.pushInFlight = true;
+
+      try {
+        const response = await fetch(Sync.url(), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tasks: State.tasks }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          Sync.lastKnownUpdatedAt = data.updatedAt;
+          Sync.failCount = 0;
+        } else {
+          Sync.failCount++;
+        }
+      } catch (_) {
+        Sync.failCount++;
+      } finally {
+        Sync.pushInFlight = false;
+        if (Sync.failCount === 3) {
+          Toast.error('Değişiklikler buluta kaydedilemiyor. İnternet bağlantını kontrol et.');
+        }
+        if (Sync.pushQueued) Sync.push();
+      }
+    },
+
+    startPolling() {
+      if (Sync.pollTimer) return;
+      Sync.pollTimer = setInterval(Sync.pull, CONFIG.SYNC_POLL_MS);
+    },
+
+    stopPolling() {
+      clearInterval(Sync.pollTimer);
+      Sync.pollTimer = null;
+    },
+
+    /** Farklı bir oda koduna geçer — mevcut kodun verisi sunucuda olduğu gibi kalır. */
+    async joinCode(newCode) {
+      Sync.stopPolling();
+      clearTimeout(Sync.pushTimer);
+      Sync.pushQueued = false;
+      Sync.failCount = 0;
+      Sync.lastKnownUpdatedAt = null;
+      Sync.code = newCode;
+      Storage.write(CONFIG.ROOM_CODE_KEY, newCode);
+      UI.renderRoomCode(newCode);
+      await Sync.pullInitial();
+      Sync.startPolling();
+    },
+  };
+
+  /* ============================================================
    * Kısaltma (üst bölüm)
    * ========================================================== */
   const Collapse = {
@@ -469,6 +640,12 @@
         const el = boardEls(board.id).count;
         if (el) el.textContent = String(State.countForBoard(board.id));
       });
+    },
+
+    renderRoomCode(code) {
+      DOM.roomCodeText.textContent = code;
+      DOM.roomCodePill.classList.remove('hidden');
+      DOM.roomCodePill.classList.add('inline-flex');
     },
 
     updateCharCount() {
@@ -755,6 +932,53 @@
 
     DOM.errorBannerClose.addEventListener('click', UI.hideError);
 
+    /* --- oda kodu: kopyala / farklı koda katıl --- */
+    DOM.roomCodeCopyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(Sync.code);
+        Toast.success('Kod kopyalandı.');
+      } catch (_) {
+        Toast.error('Kopyalanamadı. Kodu elle seç: ' + Sync.code);
+      }
+    });
+
+    DOM.joinCodeBtn.addEventListener('click', () => {
+      const opening = DOM.joinCodePanel.classList.contains('hidden');
+      DOM.joinCodePanel.classList.toggle('hidden');
+      DOM.joinCodePanel.classList.toggle('flex');
+      if (opening) DOM.joinCodeInput.focus();
+    });
+
+    DOM.joinCodeCancelBtn.addEventListener('click', () => {
+      DOM.joinCodePanel.classList.add('hidden');
+      DOM.joinCodePanel.classList.remove('flex');
+      DOM.joinCodeInput.value = '';
+    });
+
+    const confirmJoinCode = async () => {
+      const raw = DOM.joinCodeInput.value.trim().toUpperCase();
+      if (!ROOM_CODE_RE.test(raw)) {
+        Toast.error('Kod 8 karakter olmalı (0, O, 1, I, L kullanılmaz).');
+        return;
+      }
+      if (raw === Sync.code) {
+        Toast.info('Zaten bu kodun panosundasın.');
+        return;
+      }
+      DOM.joinCodePanel.classList.add('hidden');
+      DOM.joinCodePanel.classList.remove('flex');
+      DOM.joinCodeInput.value = '';
+      await Sync.joinCode(raw);
+      UI.renderBoards();
+      Toast.success('"' + raw + '" panosuna geçildi.');
+    };
+
+    DOM.joinCodeConfirmBtn.addEventListener('click', confirmJoinCode);
+    DOM.joinCodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); confirmJoinCode(); }
+      if (e.key === 'Escape') DOM.joinCodeCancelBtn.click();
+    });
+
     /* --- panolar (olay delegasyonu, her bölüm için) --- */
     CONFIG.BOARDS.forEach((board) => {
       const els = boardEls(board.id);
@@ -861,6 +1085,7 @@
     Collapse.applyAll();
     UI.renderBoards();
     UI.updateCharCount();
+    Sync.init();
   }
 
   if (document.readyState === 'loading') {

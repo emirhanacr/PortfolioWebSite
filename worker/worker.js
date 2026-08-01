@@ -28,6 +28,18 @@ const MAX_TASKS = 40;           // tek yanıtta kabul edilen azami görev
 const RATE_LIMIT_MAX = 15;      // pencere başına istek
 const RATE_LIMIT_WINDOW = 3600; // saniye (1 saat)
 
+/* ---------- pano (oda) depolama ayarları ---------- */
+
+const BOARD_CODE_RE = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{8}$/; // 0/O/1/I/L hariç
+const BOARD_MAX_TASKS = 300;
+const BOARD_MAX_BYTES = 150_000;
+const BOARD_TTL_SECONDS = 60 * 60 * 24 * 60; // 60 gün hareketsizlik sonrası silinir
+
+const BOARD_WRITE_RATE_LIMIT_MAX = 60;
+const BOARD_WRITE_RATE_LIMIT_WINDOW = 3600;
+const BOARD_READ_RATE_LIMIT_MAX = 1000;
+const BOARD_READ_RATE_LIMIT_WINDOW = 3600;
+
 // On üç kategori, üç bölüm: ilk beşi kişisel, sonraki üçü geliştirme, son beşi
 // sanat panosuna düşer. Bölüm bilgisi ayrıca taşınmaz — istemci kategoriden türetir.
 const CATEGORIES = [
@@ -77,6 +89,11 @@ export default {
       return new Response(null, { status: 204, headers: cors });
     }
 
+    const url = new URL(request.url);
+    if (url.pathname.startsWith('/board/')) {
+      return handleBoard(request, env, cors, origin, url.pathname.slice('/board/'.length));
+    }
+
     if (request.method !== 'POST') {
       return json({ error: 'Yalnızca POST destekleniyor.' }, 405, cors);
     }
@@ -94,7 +111,7 @@ export default {
 
     /* ---------- rate limit ---------- */
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const rl = await checkRateLimit(ip);
+    const rl = await checkRateLimit(`parse:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW);
     if (!rl.ok) {
       return json(
         { error: `Çok fazla istek gönderdin. ${Math.ceil(rl.retryAfter / 60)} dakika sonra tekrar dene.` },
@@ -196,7 +213,7 @@ function corsHeaders(origin) {
   };
   if (ALLOWED_ORIGINS.has(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;
-    headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS';
+    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS';
     headers['Access-Control-Allow-Headers'] = 'Content-Type';
     headers['Access-Control-Max-Age'] = '86400';
   }
@@ -215,21 +232,21 @@ function upstreamMessage(status) {
 }
 
 /**
- * IP başına kayan pencere sayacı — Cache API üzerinde.
+ * Anahtar başına kayan pencere sayacı — Cache API üzerinde.
  *
  * Not: Cloudflare cache'i veri merkezi (colo) bazlıdır, yani limit global değil
  * colo başınadır. Kötüye kullanımı yavaşlatmak için yeterlidir; asıl güvenlik
  * ağı OpenRouter tarafındaki sert kredi limitidir.
  */
-async function checkRateLimit(ip) {
+async function checkRateLimit(key, max, windowSeconds) {
   const cache = caches.default;
-  const key = new Request(`https://rate-limit.internal/${encodeURIComponent(ip)}`);
+  const cacheKey = new Request(`https://rate-limit.internal/${encodeURIComponent(key)}`);
   const now = Math.floor(Date.now() / 1000);
 
   let count = 0;
-  let resetAt = now + RATE_LIMIT_WINDOW;
+  let resetAt = now + windowSeconds;
 
-  const hit = await cache.match(key);
+  const hit = await cache.match(cacheKey);
   if (hit) {
     try {
       const prev = await hit.json();
@@ -240,19 +257,111 @@ async function checkRateLimit(ip) {
     } catch (_) { /* bozuk kayıt — sıfırdan say */ }
   }
 
-  if (count >= RATE_LIMIT_MAX) {
+  if (count >= max) {
     return { ok: false, retryAfter: Math.max(1, resetAt - now) };
   }
 
   const ttl = Math.max(1, resetAt - now);
   await cache.put(
-    key,
+    cacheKey,
     new Response(JSON.stringify({ count: count + 1, resetAt }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': `max-age=${ttl}` },
     })
   );
 
-  return { ok: true, remaining: RATE_LIMIT_MAX - count - 1 };
+  return { ok: true, remaining: max - count - 1 };
+}
+
+/* ============================ PANO (ODA) ============================ */
+
+/**
+ * Paylaşılabilir bir oda kodu altında tam görev dizisini saklar/döner.
+ * Kod = tek erişim kontrolü (parola gibi düşün) — gerçek bir kimlik doğrulama
+ * değil. Herhangi bir yazım kaydı bir öncekinin üzerine yazar (son yazan kazanır).
+ */
+async function handleBoard(request, env, cors, origin, code) {
+  if (!ALLOWED_ORIGINS.has(origin)) {
+    return json({ error: 'Bu origin yetkili değil.' }, 403, cors);
+  }
+
+  if (!BOARD_CODE_RE.test(code)) {
+    return json({ error: 'Geçersiz oda kodu.' }, 400, cors);
+  }
+
+  if (!env.BOARDS) {
+    console.error('BOARDS KV binding tanımlı değil');
+    return json({ error: 'Sunucu yapılandırması eksik.' }, 500, cors);
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+
+  if (request.method === 'GET') {
+    const rl = await checkRateLimit(`board-read:${ip}`, BOARD_READ_RATE_LIMIT_MAX, BOARD_READ_RATE_LIMIT_WINDOW);
+    if (!rl.ok) {
+      return json({ error: 'Çok fazla istek. Birazdan tekrar dene.' }, 429, { ...cors, 'Retry-After': String(rl.retryAfter) });
+    }
+
+    const stored = await env.BOARDS.get(code, { type: 'json' });
+    if (!stored) {
+      return json({ error: 'Oda bulunamadı.' }, 404, cors);
+    }
+    return json(stored, 200, cors);
+  }
+
+  if (request.method === 'PUT') {
+    const rl = await checkRateLimit(`board-write:${ip}`, BOARD_WRITE_RATE_LIMIT_MAX, BOARD_WRITE_RATE_LIMIT_WINDOW);
+    if (!rl.ok) {
+      return json(
+        { error: `Çok fazla istek gönderdin. ${Math.ceil(rl.retryAfter / 60)} dakika sonra tekrar dene.` },
+        429,
+        { ...cors, 'Retry-After': String(rl.retryAfter) }
+      );
+    }
+
+    let payload;
+    try {
+      payload = await request.json();
+    } catch (_) {
+      return json({ error: 'Geçersiz istek gövdesi.' }, 400, cors);
+    }
+
+    let tasks;
+    try {
+      tasks = normalizeBoardTasks(payload?.tasks);
+    } catch (err) {
+      return json({ error: String(err.message || err) }, 400, cors);
+    }
+
+    const body = JSON.stringify({ tasks, updatedAt: Date.now() });
+    if (body.length > BOARD_MAX_BYTES) {
+      return json({ error: 'Liste çok büyük.' }, 413, cors);
+    }
+
+    await env.BOARDS.put(code, body, { expirationTtl: BOARD_TTL_SECONDS });
+    return json(JSON.parse(body), 200, cors);
+  }
+
+  return json({ error: 'Yalnızca GET ve PUT destekleniyor.' }, 405, cors);
+}
+
+/** İstemciden gelen tam görev dizisini doğrular (pano PUT). Uydurma alanlar atılır. */
+function normalizeBoardTasks(list) {
+  if (!Array.isArray(list)) throw new Error('tasks bir dizi olmalı.');
+  if (list.length > BOARD_MAX_TASKS) throw new Error(`En fazla ${BOARD_MAX_TASKS} görev gönderebilirsin.`);
+
+  return list
+    .filter((item) => item && typeof item === 'object' && typeof item.task === 'string' && item.task.trim())
+    .map((item) => ({
+      id: typeof item.id === 'string' && item.id ? item.id.slice(0, 64) : makeId(),
+      task: item.task.trim().slice(0, 300),
+      category: canonicalCategory(item.category),
+      completed: item.completed === true,
+      createdAt: typeof item.createdAt === 'number' && Number.isFinite(item.createdAt) ? item.createdAt : Date.now(),
+    }));
+}
+
+function makeId() {
+  return 'b_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 }
 
 /** Fenced veya geveze yanıtın içinden JSON dizisini çeker. */

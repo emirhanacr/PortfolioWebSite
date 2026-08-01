@@ -91,15 +91,28 @@
 
       <!-- ============ PANO ARAÇ ÇUBUĞU ============ -->
       <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <span class="font-mono text-[11px] uppercase tracking-[0.25em] text-muted">Pano</span>
           <span id="statsPill" class="hidden items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted">
             <i class="ph-fill ph-check-circle text-accent"></i>
             <span id="statsText" class="tabular-nums">0 / 0</span>
           </span>
+          <span id="roomCodePill" class="hidden items-center gap-2 rounded-full border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted"
+            title="Bu kodu paylaşarak başkasını aynı listeye davet edebilirsin.">
+            <i class="ph ph-cloud-check text-accent"></i>
+            <span id="roomCodeText" class="tabular-nums">--------</span>
+            <button id="roomCodeCopyBtn" type="button" aria-label="Kodu kopyala"
+              class="text-muted transition hover:text-ink focus-ring">
+              <i class="ph ph-copy text-xs"></i>
+            </button>
+          </span>
         </div>
 
         <div class="flex items-center gap-2">
+          <button id="joinCodeBtn" type="button"
+            class="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition-colors duration-300 hover:border-white/25 hover:text-ink focus-ring">
+            <i class="ph ph-link text-xs"></i> Koda Katıl
+          </button>
           <button id="clearCompletedBtn" type="button"
             class="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition-colors duration-300 hover:border-white/25 hover:text-ink focus-ring">
             <i class="ph ph-broom text-xs"></i> Tamamlananlar
@@ -110,6 +123,19 @@
             <span id="clearAllLabel">Tümünü Sil</span>
           </button>
         </div>
+      </div>
+
+      <!-- ============ KODA KATIL (varsayılan gizli) ============ -->
+      <div id="joinCodePanel" class="mb-5 hidden items-center gap-2 rounded-2xl border border-white/10 bg-panel p-3">
+        <i class="ph ph-link text-sm text-accent"></i>
+        <input id="joinCodeInput" type="text" maxlength="8" autocomplete="off" spellcheck="false"
+          placeholder="Örn. 7F3K9QRT"
+          class="w-40 rounded-lg border border-white/10 bg-base px-3 py-1.5 font-mono text-xs uppercase tracking-[0.15em] text-ink placeholder-muted/50 transition focus:border-accent/60 focus:outline-none focus-ring" />
+        <button id="joinCodeConfirmBtn" type="button"
+          class="rounded-full bg-accent px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-base transition hover:brightness-110 focus-ring">Katıl</button>
+        <button id="joinCodeCancelBtn" type="button"
+          class="rounded-full border border-white/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-muted transition hover:border-white/25 hover:text-ink focus-ring">Vazgeç</button>
+        <span class="text-xs text-muted/70">Arkadaşının paylaştığı kodu gir, aynı listeyi görün.</span>
       </div>
 
       <!-- ============ KİŞİSEL BÖLÜM ============ -->
@@ -171,7 +197,10 @@
         <i class="ph ph-info mt-0.5 shrink-0"></i>
         <span>
           Yazdığın metin, ayrıştırılmak üzere yapay zeka servisine (OpenRouter) gönderilir.
-          Oluşan görevler yalnızca kendi tarayıcında saklanır, sunucuya kaydedilmez.
+          Görevlerin kendisi, yukarıdaki "Pano" kodu altında Cloudflare üzerinde saklanır
+          ki tarayıcı verisi silinince kaybolmasın ve istersen kodu paylaşarak başkasıyla
+          aynı liste üzerinde çalışabilesin. Kod, panoya erişmek için tek koşuldur — bir
+          parola gibi düşün, kimseyle paylaşmadığın sürece listen sadece sende kalır.
           Hassas bilgi girmemeni öneririm.
         </span>
       </p>
