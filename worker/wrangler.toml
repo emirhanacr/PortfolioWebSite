@@ -2,6 +2,11 @@ name = "gorev-ayristirici-api"
 main = "worker.js"
 compatibility_date = "2025-01-01"
 
+# routes/custom_domain eklenince wrangler workers_dev'i varsayılan olarak
+# kapatıyor — özel alan adına geçiş tamamlanana kadar eski workers.dev
+# adresi kırılmasın diye açık tutuluyor.
+workers_dev = true
+
 # Log ve metrikleri açar — kötüye kullanımı fark etmek için gerekli.
 [observability]
 enabled = true
@@ -16,3 +21,11 @@ enabled = true
 [[kv_namespaces]]
 binding = "BOARDS"
 id = "e3839a81698a4b0abeb3165a90db23d0"
+
+# Paylaşılan workers.dev alan adı yerine kendi zone'umuzdaki özel alan adı —
+# workers.dev "best-effort" bir alan adıdır, üretim trafiği için Cloudflare'in
+# kendisi özel alan adı öneriyor. workers.dev route'u devre dışı bırakılmadı,
+# ikisi paralel çalışır; sorun devam ederse client'ı buna yönlendireceğiz.
+[[routes]]
+pattern = "api.emirhanacr.com"
+custom_domain = true

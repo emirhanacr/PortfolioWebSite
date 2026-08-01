@@ -76,12 +76,32 @@ saklanıyor. Bu adım olmadan `/board/*` uçları 500 döner (AI ayrıştırma e
 Wrangler CLI ile deploy ediyorsan bunun yerine `worker/wrangler.toml` içindeki
 `[[kv_namespaces]]` bloğuna namespace id'sini yapıştır.
 
+### 3.5. Özel alan adı (workers.dev yerine kendi zone'un)
+
+`*.workers.dev` Cloudflare tarafından "best-effort" olarak tanımlanıyor —
+üretim trafiği için resmen önerilmiyor. Bu projede paylaşılan `workers.dev`
+adresinde tekrarlayan `ERR_CONNECTION_RESET` hataları görüldüğü için Worker,
+zone'umuzdaki `api.emirhanacr.com` özel alan adına da bağlandı
+(`worker/wrangler.toml` → `[[routes]]`, `custom_domain = true`).
+
+Wrangler CLI ile `wrangler deploy` çalıştırdığında bu route otomatik kurulur
+(zone'un aynı Cloudflare hesabında olması yeterli — DNS kaydı kendiliğinden
+oluşur). Dashboard'dan deploy ediyorsan: Worker sayfası → **Settings** →
+**Domains & Routes** → **Add** → **Custom Domain** → `api.emirhanacr.com`.
+
+`workers_dev = true` bilinçli olarak `wrangler.toml`'da açık bırakıldı — özel
+alan adı sorun çıkarırsa eski `workers.dev` adresine geri dönebilmek için.
+İstemci (`scripts/gorev-ayristirici.js` → `API_ENDPOINT`/`BOARD_ENDPOINT`)
+artık `https://api.emirhanacr.com` kullanıyor.
+
 ### 4. Adresi siteye tanıt
 
-`scripts/gorev-ayristirici.js` içindeki `API_ENDPOINT` değerini yukarıdaki
-adresle değiştir (`DEGISTIR` yazan yer):
+`scripts/gorev-ayristirici.js` içindeki `API_ENDPOINT` (ve `BOARD_ENDPOINT`)
+değerini yukarıdaki adresle değiştir:
 
 ```js
+API_ENDPOINT: 'https://api.emirhanacr.com',        // özel alan adı (önerilen)
+// veya, özel alan adı kurulmadıysa:
 API_ENDPOINT: 'https://gorev-ayristirici-api.<kullanıcı-adın>.workers.dev',
 ```
 

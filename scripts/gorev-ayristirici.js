@@ -17,10 +17,12 @@
    * AYAR
    * ========================================================== */
   const CONFIG = Object.freeze({
-    // `npx wrangler deploy` / Cloudflare paneli çıktısındaki adres.
-    API_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev',
+    // Kendi zone'umuzdaki özel alan adı (worker/wrangler.toml → [[routes]]).
+    // Paylaşılan workers.dev alan adında tekrarlayan bağlantı kopmaları (ERR_CONNECTION_RESET)
+    // yaşandığı için buraya taşındı; workers.dev route'u yedek olarak hâlâ açık.
+    API_ENDPOINT: 'https://api.emirhanacr.com',
     // Aynı Worker'daki paylaşılan pano uçları — worker/worker.js → handleBoard.
-    BOARD_ENDPOINT: 'https://gorev-ayristirici-api.emirhan-acr.workers.dev/board',
+    BOARD_ENDPOINT: 'https://api.emirhanacr.com/board',
 
     STORAGE_KEY: 'gorev_ayristirici_tasks',
     ROOM_CODE_KEY: 'gorev_ayristirici_room_code',
