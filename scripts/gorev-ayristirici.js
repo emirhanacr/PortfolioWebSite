@@ -478,7 +478,14 @@
       Sync.pollTimer = null;
     },
 
-    /** Farklı bir oda koduna geçer — mevcut kodun verisi sunucuda olduğu gibi kalır. */
+    /**
+     * Farklı bir oda koduna geçer — mevcut kodun verisi sunucuda olduğu gibi kalır.
+     * `pullInitial()`'dan KASITLI olarak farklı davranır: orada 404, "ilk açılış,
+     * yereldeki görevleri buluta taşı" anlamına gelir. Burada ise kullanıcı bilerek
+     * başka bir odaya geçiyor — hedef kod boşsa (henüz kimse yazmamışsa) panoyu
+     * BOŞALTMALIYIZ, yoksa önceki odanın görevleri sessizce yeni koda kopyalanır ve
+     * ekranda hiçbir şey değişmemiş gibi görünür (tam da bildirilen hata buydu).
+     */
     async joinCode(newCode) {
       Sync.stopPolling();
       clearTimeout(Sync.pushTimer);
@@ -488,7 +495,19 @@
       Sync.code = newCode;
       Storage.write(CONFIG.ROOM_CODE_KEY, newCode);
       UI.renderRoomCode(newCode);
-      await Sync.pullInitial();
+
+      try {
+        const response = await fetch(Sync.url());
+        if (response.status === 404) {
+          State.tasks = [];
+          State.persistFromRemote();
+          UI.renderBoards();
+          Sync.schedulePush(0); // boş panoyu sunucuda oluştur
+        } else if (response.ok) {
+          Sync.applyRemote(await response.json());
+        }
+      } catch (_) { /* sessiz — bir sonraki poll dener */ }
+
       Sync.startPolling();
     },
   };
